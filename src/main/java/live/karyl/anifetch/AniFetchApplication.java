@@ -1,7 +1,9 @@
 package live.karyl.anifetch;
 
 import live.karyl.anifetch.connection.OkHttp;
+import live.karyl.anifetch.providers.vn.AnimeTVN;
 import live.karyl.anifetch.utils.SearchRequest;
+import live.karyl.anifetch.utils.Utils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -17,8 +19,13 @@ public class AniFetchApplication {
 
 		connection = new OkHttp();
 
-		var a = SearchRequest.animeTVN("naruto");
-		System.out.println(Arrays.asList(a));
+		/*var test = new AnimeTVN();
+		var anilistInfo = Utils.fetchAnilist("143270");
+		var result = test.search(anilistInfo);
+		System.out.println("Result id: " + result.getProviderId());
+		System.out.println("Episodes: " + result.getEpisodesId().size() + " tập");*/
+		var test = SearchRequest.webLinhTinh("Kimi no Na wa");
+		System.out.println(Arrays.toString(test));
 
 
 		SpringApplication.run(AniFetchApplication.class, args);

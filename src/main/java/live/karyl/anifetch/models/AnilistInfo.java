@@ -29,6 +29,7 @@ public class AnilistInfo {
 	private EndDate endDate;
 	private NextAiringEpisode nextAiringEpisode;
 	private int totalEpisodes;
+	private int currentEpisode;
 	private int rating;
 	private int duration;
 	private String[] genres;
@@ -116,6 +117,10 @@ public class AnilistInfo {
 
 	public int getTotalEpisodes() {
 		return totalEpisodes;
+	}
+
+	public int getCurrentEpisode() {
+		return currentEpisode;
 	}
 
 	public int getRating() {
