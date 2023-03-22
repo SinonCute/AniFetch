@@ -1,18 +1,21 @@
 package live.karyl.anifetch.models;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.gson.Gson;
+
+import java.util.*;
 
 public class AnimeParser {
 	private final String animeId;
 	private final String providerId;
+	private final String providerName;
 
-	private Map<Integer, String> episodesId;
+	private final List<Episode> episodes;
 
-	public AnimeParser(String animeId, String providerId) {
+	public AnimeParser(String animeId, String providerId, String providerName) {
 		this.animeId = animeId;
 		this.providerId = providerId;
-		episodesId = new HashMap<>();
+		this.providerName = providerName;
+		episodes = new ArrayList<>();
 	}
 
 	public String getAnimeId() {
@@ -23,15 +26,28 @@ public class AnimeParser {
 		return providerId;
 	}
 
-	public Map<Integer, String> getEpisodesId() {
-		return episodesId;
+	public List<Episode> getEpisodes() {
+		return episodes;
 	}
 
-	public void setEpisodesId(Map<Integer, String> episodesId) {
-		this.episodesId = episodesId;
+	public String getProviderName() { return providerName; }
+
+	public void setEpisodes(List<String> episodesId) {
+		episodes.clear();
+		for (int i = 0; i < episodesId.size(); i++) {
+			episodes.add(new Episode(i + 1, episodesId.get(i)));
+		}
 	}
 
-	public void addEpisodeId(int episode, String id) {
-		episodesId.put(episode, id);
+	public String toJson() {
+		Gson gson = new Gson();
+		return gson.toJson(this);
 	}
+
+	public AnimeParser fromJson(String json) {
+		Gson gson = new Gson();
+		return gson.fromJson(json, AnimeParser.class);
+	}
+
+	public record Episode(int episodeNumber, String value) {}
 }

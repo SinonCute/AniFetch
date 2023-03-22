@@ -1,37 +1,43 @@
 package live.karyl.anifetch;
 
 import live.karyl.anifetch.connection.OkHttp;
+import live.karyl.anifetch.database.Redis;
+import live.karyl.anifetch.providers.AnimeProvider;
 import live.karyl.anifetch.providers.vn.AnimeTVN;
-import live.karyl.anifetch.utils.SearchRequest;
-import live.karyl.anifetch.utils.Utils;
+import live.karyl.anifetch.providers.vn.WebLinhTinh;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.IOException;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 @SpringBootApplication
 public class AniFetchApplication {
 
 	private static OkHttp connection;
+	private static Redis redis;
+	private static final Map<String, AnimeProvider> providers = new HashMap<>();
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 
 		connection = new OkHttp();
-
-		/*var test = new AnimeTVN();
-		var anilistInfo = Utils.fetchAnilist("143270");
-		var result = test.search(anilistInfo);
-		System.out.println("Result id: " + result.getProviderId());
-		System.out.println("Episodes: " + result.getEpisodesId().size() + " tập");*/
-		var test = SearchRequest.webLinhTinh("Kimi no Na wa");
-		System.out.println(Arrays.toString(test));
-
+		redis = new Redis();
+		redis.init();
+		init();
 
 		SpringApplication.run(AniFetchApplication.class, args);
+	}
+
+	public static void init() {
+		providers.put("AnimeTVN", new AnimeTVN());
+		providers.put("WebLinhTinh", new WebLinhTinh());
 	}
 
 	public static OkHttp getConnection() {
 		return connection;
 	}
+
+	public static Map<String, AnimeProvider> getProviders() { return providers; }
+
+	public static Redis getRedis() { return redis; }
 }

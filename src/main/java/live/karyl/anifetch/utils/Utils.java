@@ -2,12 +2,16 @@ package live.karyl.anifetch.utils;
 
 import live.karyl.anifetch.AniFetchApplication;
 import live.karyl.anifetch.models.AnilistInfo;
+import live.karyl.anifetch.models.AnimeParser;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.tinylog.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Utils {
 
@@ -54,5 +58,17 @@ public class Utils {
     public static double matchedRate(String title1, String title2) {
         JaroWinklerSimilarity jaroWinklerSimilarity = new JaroWinklerSimilarity();
         return jaroWinklerSimilarity.apply(title1, title2);
+    }
+
+    public static List<AnimeParser> searchAll(String id) {
+        AnilistInfo anilistInfo = fetchAnilist(id);
+        List<AnimeParser> animeParsers = new ArrayList<>();
+        for (var provider : AniFetchApplication.getProviders().values()) {
+            var animeParser = provider.search(anilistInfo);
+            if (animeParser != null) {
+                animeParsers.add(animeParser);
+            }
+        }
+        return animeParsers;
     }
 }

@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class SearchRequest {
 
-	public static String[] animeTVN(String key) {
+	public static String[] animeTVN(String key, String[] token) {
 		try {
 			String searchURL = "https://animetvn.xyz/ajax/search";
 
@@ -20,9 +20,9 @@ public class SearchRequest {
 			Request request = new Request.Builder()
 					.url(searchURL)
 					.post(requestBody)
-					.addHeader("x-csrf-token", "L8l9OmdJWvtdoJos6mOGzkhKTVkHZyQhUNISxSvK")
+					.addHeader("x-csrf-token", token[0])
 					.addHeader("x-requested-with", "XMLHttpRequest")
-					.addHeader("Cookie", "XSRF-TOKEN=eyJpdiI6InZMMFZuS2lONjVjTW1RK1d3TU0yTkE9PSIsInZhbHVlIjoiV2N0cWQzMURYamVMOExYdVp1Rk1IM3BDTG1XajVYOHpjZ29sRGMwWG9HK3dsR0FPc2IzRGFoc2ZUVFNqUFVNajcyKyt5Wm02WjZOTmVxdnE4Y3JFM2c9PSIsIm1hYyI6Ijk2MDI5ZTVmNDM0ZWE2YWY5NjRjN2E1MDAyYzg0YmEzOWE0MmE1NWU0YjY2OTdlMjJhOWNiODdiY2JiMzRmZjkifQ%3D%3D; laravel_session=eyJpdiI6IlNKMEU1eG9tWHhuMTdGMW1WSTd0eEE9PSIsInZhbHVlIjoic28yZXZIbEpuUVE5ZFAybzNnUElDNjFBS2phMmhkQ2lCVHVqRlpOUTRqVFFid2QxN213NkI0VmtscEpaQU9QYmhTVnlXdTM3MlNGamxONUV2YTNockE9PSIsIm1hYyI6ImQyMzEzMWM5MDZkOTNlMjdhYzEzZTAyZjFjYjllYTU3MTdjZmFmNTZkODY5ZDgxNmQ4YjcwMzIwMTUxOTg4NjUifQ%3D%3D")
+					.addHeader("Cookie", token[1])
 					.build();
 			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
 			if (response.code() != 200) {

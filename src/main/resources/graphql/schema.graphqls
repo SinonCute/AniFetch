@@ -1,0 +1,20 @@
+type Query {
+  anime(id: ID): [Anime]
+  source(providerId: String, value: String): AnimeSource
+}
+
+type Anime {
+  animeId: ID # Anime ID
+  providerId: ID # Provider ID
+  providerName: String # Provider name
+  episodes: [Episode]
+}
+
+type Episode {
+  episodeNumber: Int # Episode number
+  value: String # Episode name
+}
+
+type AnimeSource {
+  link: String # Link to the video
+}
