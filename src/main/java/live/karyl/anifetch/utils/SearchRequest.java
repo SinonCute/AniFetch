@@ -1,25 +1,25 @@
 package live.karyl.anifetch.utils;
 
 import live.karyl.anifetch.AniFetchApplication;
+import live.karyl.anifetch.models.AnilistInfo;
 import okhttp3.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class SearchRequest {
 
-	public static String[] animeTVN(String key, String[] token) {
+	public static String[] animeTVN(String key, String year, String[] token) {
 		try {
-			String searchURL = "https://animetvn.xyz/ajax/search";
-
-			RequestBody requestBody = new FormBody.Builder()
-					.addEncoded("key", key)
-					.build();
+			String searchURL = "https://animetvn.xyz/tim-kiem-nang-cao.html?" +
+					"q=" + URLEncoder.encode(key, StandardCharsets.UTF_8) +
+					"&nam=" + year;
 			Request request = new Request.Builder()
 					.url(searchURL)
-					.post(requestBody)
 					.addHeader("x-csrf-token", token[0])
 					.addHeader("x-requested-with", "XMLHttpRequest")
 					.addHeader("Cookie", token[1])
@@ -30,7 +30,7 @@ public class SearchRequest {
 				return null;
 			}
 			Document doc = Jsoup.parse(response.body().string());
-			Elements elements = doc.select(".search-list > .item > .image");
+			Elements elements = doc.select(".film-list > .film_item > .film_item_inner > a");
 			System.out.println(elements.size() + " results");
 			return elements.stream().map(element -> element.attr("href")).toArray(String[]::new);
 		} catch (IOException e) {

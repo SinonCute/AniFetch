@@ -1,6 +1,7 @@
 package live.karyl.anifetch;
 
 import live.karyl.anifetch.connection.OkHttp;
+import live.karyl.anifetch.database.PostgreSQL;
 import live.karyl.anifetch.database.Redis;
 import live.karyl.anifetch.providers.AnimeProvider;
 import live.karyl.anifetch.providers.vn.AnimeTVN;
@@ -16,13 +17,19 @@ public class AniFetchApplication {
 
 	private static OkHttp connection;
 	private static Redis redis;
+	private static PostgreSQL postgreSQL;
 	private static final Map<String, AnimeProvider> providers = new HashMap<>();
 
 	public static void main(String[] args) {
 
 		connection = new OkHttp();
+
 		redis = new Redis();
 		redis.init();
+
+		postgreSQL = new PostgreSQL();
+		postgreSQL.init();
+
 		init();
 
 		SpringApplication.run(AniFetchApplication.class, args);
@@ -40,4 +47,6 @@ public class AniFetchApplication {
 	public static Map<String, AnimeProvider> getProviders() { return providers; }
 
 	public static Redis getRedis() { return redis; }
+
+	public static PostgreSQL getPostgreSQL() { return postgreSQL; }
 }

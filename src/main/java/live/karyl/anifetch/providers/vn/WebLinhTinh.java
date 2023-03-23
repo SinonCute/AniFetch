@@ -15,7 +15,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,18 +31,17 @@ public class WebLinhTinh extends AnimeProvider {
     public AnimeParser search(AnilistInfo anilistInfo) {
         AnimeParser animeParser = null;
         String redisId = siteName + "$" + anilistInfo.getId();
-        List<String> titles = new ArrayList<>();
-        titles.add(anilistInfo.getTitle().english);
-        titles.add(anilistInfo.getTitle().romaji);
-        titles.add(anilistInfo.getTitle().nativeTitle);
+        Map<String, String> titles = new HashMap<>();
+        titles.put("english", anilistInfo.getTitle().english);
+        titles.put("romaji", anilistInfo.getTitle().romaji);
 
         if (redis.exists(redisId, "search")) {
             animeParser = new Gson().fromJson(redis.get(redisId, "search"), AnimeParser.class);
             if (animeParser != null) return animeParser;
         }
 
-        if (redis.exists(redisId, "provider")) {
-            String id = redis.get(redisId, "provider");
+        if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
+            var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
             var episodes = extractEpisodeIds(id);
             animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
             animeParser.setEpisodes(episodes);
@@ -48,21 +49,23 @@ public class WebLinhTinh extends AnimeProvider {
             return animeParser;
         }
 
-        for (String title : titles) {
+        for (var key : titles.keySet()) {
+            var title = titles.get(key);
             if (animeParser != null) break;
             var searchResults = SearchRequest.webLinhTinh(title);
             if (searchResults == null) continue;
             for (var searchResult : searchResults) {
                 var mainPage = Utils.connect(searchResult);
-                if (compareResult(mainPage, anilistInfo)) {
+                if (compareResult(mainPage, anilistInfo, key)) {
                     var id = mainPage.select("#bookmark").attr("data-id");
                     animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
                     animeParser.setEpisodes(extractEpisodeIds(id));
-                    redis.set(redisId, id, "provider");
+                    postgreSQL.addAnimeFetch(animeParser);
                     break;
                 }
             }
         }
+        if (animeParser == null) return null;
         redis.set(redisId, animeParser.toJson(), "search");
         return animeParser;
     }
@@ -112,13 +115,19 @@ public class WebLinhTinh extends AnimeProvider {
         return new AnimeSource(link);
     }
 
-    private boolean compareResult(Document mainPage, AnilistInfo anilistInfo) {
+    private boolean compareResult(Document mainPage, AnilistInfo anilistInfo, String type) {
         var title = mainPage.select(".title-wrapper > .entry-title").text();
         int year = Integer.parseInt(StringUtils.substringBetween(mainPage.select(".title-wrapper").html(), "(", ")"));
         int episode = Integer.parseInt(mainPage.select(".more-info").get(0).text().split("/")[0]);
+        System.out.println(title + " " + year + " " + episode);
+        if (type.equals("english")) {
+            return year == anilistInfo.getReleaseDate()
+                    && episode == anilistInfo.getCurrentEpisode()
+                    && Utils.matchedRate(title, anilistInfo.getTitle().english) > 0.5;
+        }
         return year == anilistInfo.getReleaseDate()
                 && episode == anilistInfo.getCurrentEpisode()
-                && Utils.matchedRate(title, anilistInfo.getTitle().english) > 0.5;
+                && Utils.matchedRate(title, anilistInfo.getTitle().romaji) > 0.5;
     }
 
     public String requestPostGetLink(String[] data, String actionType) {

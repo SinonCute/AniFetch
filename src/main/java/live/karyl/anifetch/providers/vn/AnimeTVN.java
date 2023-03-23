@@ -40,41 +40,43 @@ public class AnimeTVN extends AnimeProvider {
 	public AnimeParser search(AnilistInfo anilistInfo) {
 		AnimeParser animeParser = null;
 		String redisId = siteName + "$" + anilistInfo.getId();
-		List<String> titles = new ArrayList<>();
-		titles.add(anilistInfo.getTitle().english);
-		titles.add(anilistInfo.getTitle().romaji);
-		titles.add(anilistInfo.getTitle().nativeTitle);
+		Map<String, String> titles = new HashMap<>();
+		titles.put("english", anilistInfo.getTitle().english);
+		titles.put("romaji", anilistInfo.getTitle().romaji);
 
 		if (redis.exists(redisId, "search")) {
 			animeParser = new Gson().fromJson(redis.get(redisId, "search"), AnimeParser.class);
 			if (animeParser != null) return animeParser;
 		}
 
-		if (redis.exists(redisId, "provider")) {
-			String id = redis.get(redisId, "provider");
-			var episodes = extractEpisodeIds(id);
+		if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
+			var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
+			var episodes = extractEpisodeIds("https://animetvn.xyz/thong-tin-phim/f" + id + "-a.html");
 			animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
 			animeParser.setEpisodes(episodes);
 			redis.set(redisId, animeParser.toJson(), "search");
 			return animeParser;
 		}
 
-		for (String title : titles) {
+		for (String key : titles.keySet()) {
+			String title = titles.get(key);
 			if (animeParser != null) break;
 			if (title == null) continue;
-			var searchResults = SearchRequest.animeTVN(title, token);
+			var searchResults = SearchRequest.animeTVN(title, anilistInfo.getReleaseDate() + "", token);
 			if (searchResults == null) continue;
 			for (var searchResult : searchResults) {
-				if (compareResult(anilistInfo, searchResult)) {
+				if (compareResult(anilistInfo, searchResult, key)) {
+					System.out.println("Found " + siteName + " " + title);
 					String id = searchResult.replaceAll("^.*f(\\d+).*$", "$1");
 					var episodes = extractEpisodeIds(searchResult);
 					animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
 					animeParser.setEpisodes(episodes);
-					redis.set(redisId, id, "provider");
+					postgreSQL.addAnimeFetch(animeParser);
 					break;
 				}
 			}
 		}
+		if (animeParser == null) return null;
 		redis.set(redisId, animeParser.toJson(), "search");
 		return animeParser;
 	}
@@ -137,6 +139,7 @@ public class AnimeTVN extends AnimeProvider {
 
 		List<String> episodes = new ArrayList<>();
 
+		//todo get text to determine episode number
 		for (var server : watchPage.select(".eplist").get(0).getElementsByClass("svep")) {
 			if (server.select(".svname").text().equalsIgnoreCase("Trailer")) continue;
 			for (var ep : server.select("a.tapphim")) {
@@ -148,11 +151,12 @@ public class AnimeTVN extends AnimeProvider {
 		return episodes;
 	}
 
-	private boolean compareResult(AnilistInfo anilistInfo, String link) {
+	private boolean compareResult(AnilistInfo anilistInfo, String link, String type) {
 		Document document = Utils.connect(link);
 		String title = document.select(".name-vi").first().text();
 		int year = 0;
 		int episode = 0;
+
 		for (var info : document.select(".more-info")) {
 			Pattern episodePattern = Pattern.compile("Số tập: </span>(\\d+)");
 			Pattern yearPattern = Pattern.compile("Năm phát sóng: </span>(\\w+\\s+\\d{4})");
@@ -165,9 +169,14 @@ public class AnimeTVN extends AnimeProvider {
 				year = Integer.parseInt(yearMatcher.group(1).split(" ")[1]);
 			}
 		}
+		if (type.equals("english")) {
+			return year == anilistInfo.getReleaseDate()
+					&& episode == anilistInfo.getCurrentEpisode()
+					&& Utils.matchedRate(title, anilistInfo.getTitle().english) > 0.5;
+		}
 		return year == anilistInfo.getReleaseDate()
 				&& episode == anilistInfo.getCurrentEpisode()
-				&& Utils.matchedRate(title, anilistInfo.getTitle().english) > 0.5;
+				&& Utils.matchedRate(title, anilistInfo.getTitle().romaji) > 0.5;
 	}
 
 	public String playHQB(String fileID) {

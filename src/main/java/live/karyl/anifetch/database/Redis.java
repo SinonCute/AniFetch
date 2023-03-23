@@ -12,16 +12,13 @@ public class Redis {
 	}
 
 	public void set(String key, String value, String type) {
+		if (!jedis.isConnected()) return;
 		System.out.println("Setting " + key + " to " + value);
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
 				jedis.set(prefix + key, value);
 				jedis.expire(key, 43200); // 12 hours
-			}
-			case "provider" -> {
-				var prefix = "provider:";
-				jedis.set(prefix + key, value);
 			}
 			case "source" -> {
 				var prefix = "source:";
@@ -32,14 +29,11 @@ public class Redis {
 	}
 
 	public String get(String key, String type) {
+		if (!jedis.isConnected()) return null;
 		System.out.println("Getting " + key + " from redis");
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
-				return jedis.get(prefix + key);
-			}
-			case "provider" -> {
-				var prefix = "provider:";
 				return jedis.get(prefix + key);
 			}
 			case "source" -> {
@@ -51,14 +45,11 @@ public class Redis {
 	}
 
 	public boolean exists(String key, String type) {
+		if (!jedis.isConnected()) return false;
 		System.out.println("Checking if " + key + " exists");
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
-				return jedis.exists(prefix + key);
-			}
-			case "provider" -> {
-				var prefix = "provider:";
 				return jedis.exists(prefix + key);
 			}
 			case "source" -> {
@@ -73,10 +64,6 @@ public class Redis {
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
-				jedis.del(prefix + key);
-			}
-			case "provider" -> {
-				var prefix = "provider:";
 				jedis.del(prefix + key);
 			}
 			case "source" -> {
