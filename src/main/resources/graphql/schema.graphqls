@@ -24,4 +24,5 @@ type Source {
   link: String # Link to the video
   type: String # Type of the video
   serverId: ID # Server ID
+  headers: [String] # Headers
 }

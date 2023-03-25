@@ -16,6 +16,7 @@ public abstract class AnimeProvider {
     protected final String baseUrl;
 
     protected final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36";
+    protected final String PROXY_VN = "https://proxy-vn.karyl.live/v1/server/proxy?link=";
 
     protected final OkHttp connection = AniFetchApplication.getConnection();
     protected final Redis redis = AniFetchApplication.getRedis();

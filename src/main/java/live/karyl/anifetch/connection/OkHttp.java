@@ -20,7 +20,6 @@ public class OkHttp {
     }
 
     public Response call(Request request) {
-       // Logger.debug("Call: " + request.url());
         var retry = 5;
         while (retry > 0) {
             try {
@@ -34,11 +33,6 @@ public class OkHttp {
     }
 
     public Response callWithoutRateLimit(Request request) {
-       // Logger.debug("Call (NoRateLimit): " + request.url());
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.readTimeout(15, TimeUnit.SECONDS);
-        builder.connectTimeout(15, TimeUnit.SECONDS);
-        client = builder.build();
         var retry = 5;
         while (retry > 0) {
             try {

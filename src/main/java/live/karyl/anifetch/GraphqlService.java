@@ -28,6 +28,9 @@ public class GraphqlService {
 			case "WLT" -> {
 				return AniFetchApplication.getProviders().get("WebLinhTinh").getLink(value);
 			}
+			case "AH" -> {
+				return AniFetchApplication.getProviders().get("AnimeHay").getLink(value);
+			}
 		}
 		return null;
 	}

@@ -12,6 +12,7 @@ import org.tinylog.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class Utils {
 
@@ -57,7 +58,7 @@ public class Utils {
 
     public static double matchedRate(String title1, String title2) {
         JaroWinklerSimilarity jaroWinklerSimilarity = new JaroWinklerSimilarity();
-        return jaroWinklerSimilarity.apply(title1, title2);
+        return jaroWinklerSimilarity.apply(title1.toLowerCase(Locale.ROOT), title2.toLowerCase(Locale.ROOT));
     }
 
     public static List<AnimeParser> searchAll(String id) {
@@ -72,7 +73,7 @@ public class Utils {
         return animeParsers;
     }
 
-    public static boolean checkEpisodeNumber(int episodeNumber, int currentEpisode) {
-        return Math.abs(episodeNumber - currentEpisode) <= 1;
+    public static boolean checkNumberEqual(int int1, int int2) {
+        return Math.abs(int1 - int2) <= 1;
     }
 }

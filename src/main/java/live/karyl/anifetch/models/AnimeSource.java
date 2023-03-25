@@ -23,6 +23,10 @@ public class AnimeSource {
 		sources.add(new Source(link, serverId, type));
 	}
 
+	public void addSource(Source source) {
+		sources.add(source);
+	}
+
 	public List<Source> getSources() { return sources; }
 
 	public String toJson() {
@@ -35,15 +39,17 @@ public class AnimeSource {
 		return gson.fromJson(json, AnimeSource.class);
 	}
 
-	public class Source {
+	public static class Source {
 		private final String link;
 		private final String type;
 		private final String serverId;
+		private final List<String> headers;
 
 		public Source(String link, String serverId, String type) {
 			this.link = link;
 			this.type = type;
 			this.serverId = serverId;
+			headers = new ArrayList<>();
 		}
 
 		public String getLink() {
@@ -57,5 +63,11 @@ public class AnimeSource {
 		public String getServerId() {
 			return serverId;
 		}
+
+		public void addHeader(String header) {
+			headers.add(header);
+		}
+
+		public List<String> getHeaders() { return headers; }
 	}
 }

@@ -4,6 +4,7 @@ import live.karyl.anifetch.connection.OkHttp;
 import live.karyl.anifetch.database.PostgreSQL;
 import live.karyl.anifetch.database.Redis;
 import live.karyl.anifetch.providers.AnimeProvider;
+import live.karyl.anifetch.providers.vn.AnimeHay;
 import live.karyl.anifetch.providers.vn.AnimeTVN;
 import live.karyl.anifetch.providers.vn.WebLinhTinh;
 import org.springframework.boot.SpringApplication;
@@ -23,6 +24,7 @@ public class AniFetchApplication {
 	public static void main(String[] args) {
 
 		connection = new OkHttp();
+		connection.init();
 
 		redis = new Redis();
 		redis.init();
@@ -38,6 +40,7 @@ public class AniFetchApplication {
 	public static void init() {
 		providers.put("AnimeTVN", new AnimeTVN());
 		providers.put("WebLinhTinh", new WebLinhTinh());
+		providers.put("AnimeHay", new AnimeHay());
 	}
 
 	public static OkHttp getConnection() {

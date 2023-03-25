@@ -131,11 +131,11 @@ public class WebLinhTinh extends AnimeProvider {
             System.out.println("debug:" + year + " " + anilistInfo.getReleaseDate() + " " + episode + " " + anilistInfo.getCurrentEpisode() + " " + Utils.matchedRate(title, anilistInfo.getTitle().romaji));
             if (type.equals("english")) {
                 return year == anilistInfo.getReleaseDate()
-                        && Utils.checkEpisodeNumber(episode, anilistInfo.getCurrentEpisode())
+                        && Utils.checkNumberEqual(episode, anilistInfo.getCurrentEpisode())
                         && Utils.matchedRate(title, anilistInfo.getTitle().english) > 0.5;
             }
             return year == anilistInfo.getReleaseDate()
-                    && Utils.checkEpisodeNumber(episode, anilistInfo.getCurrentEpisode())
+                    && Utils.checkNumberEqual(episode, anilistInfo.getCurrentEpisode())
                     && Utils.matchedRate(title, anilistInfo.getTitle().romaji) > 0.5;
         } catch (Exception e) {
             e.printStackTrace();
