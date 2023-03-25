@@ -2,13 +2,13 @@
 ### Todo
 
 - [ ] Animevietsub  
-- [ ] Animehay 
 - [ ] Anime47 
 - [ ] Vuighe 
 - [ ] Bilibili 
 
 ### In Progress
 
+- [ ] Animehay 
 - [ ] Weblinhtinh
 - [ ] Animetvn
 
