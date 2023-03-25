@@ -25,8 +25,8 @@ public class SearchRequest {
 			Request request = new Request.Builder()
 					.url(searchURL)
 					.addHeader("x-csrf-token", token[0])
-					.addHeader("x-requested-with", "XMLHttpRequest")
 					.addHeader("Cookie", token[1])
+					.addHeader("x-requested-with", "XMLHttpRequest")
 					.build();
 			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
 			if (response.code() != 200) {
@@ -35,7 +35,25 @@ public class SearchRequest {
 			}
 			Document doc = Jsoup.parse(response.body().string());
 			Elements elements = doc.select(".film-list > .film_item > .film_item_inner > a");
-			System.out.println(elements.size() + " results on WebLinhTinh");
+
+			if (elements.size() == 0) {
+				System.out.println("No result on animeTVN, trying to search with ajax");
+				RequestBody requestBody = new FormBody.Builder()
+						.addEncoded("key", key)
+						.build();
+				request = new Request.Builder()
+						.url("https://animetvn.xyz/ajax/search")
+						.addHeader("x-csrf-token", token[0])
+						.addHeader("Cookie", token[1])
+						.addHeader("x-requested-with", "XMLHttpRequest")
+						.post(requestBody)
+						.build();
+				response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
+				doc = Jsoup.parse(response.body().string());
+				elements = doc.select(".search-list > .item > .image");
+			}
+
+			System.out.println(elements.size() + " results on animeTVN");
 			return elements.stream().map(element -> element.attr("href")).toArray(String[]::new);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -65,7 +83,7 @@ public class SearchRequest {
 			}
 			Document doc = Jsoup.parse(response.body().string());
 			Elements elements = doc.select(".exact_result > a");
-			System.out.println(elements.size() + " results on AnimeTVN" );
+			System.out.println(elements.size() + " results on webLinhTinh" );
 			return elements.stream().map(element -> element.attr("href")).toArray(String[]::new);
 		} catch (IOException e) {
 			e.printStackTrace();
