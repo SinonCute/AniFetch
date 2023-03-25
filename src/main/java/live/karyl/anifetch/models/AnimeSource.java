@@ -1,21 +1,61 @@
 package live.karyl.anifetch.models;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class AnimeSource {
+
 	private final String providerId;
-	private final String serverId;
-	private final String link;
+	private final List<Source> sources;
 
-	public AnimeSource(String link, String providerId, String serverId) {
-		this.link = link;
+	public AnimeSource(String providerId) {
 		this.providerId = providerId;
-		this.serverId = serverId;
+		sources = new ArrayList<>();
 	}
 
-	public String getLink() {
-		return link;
+	public String getProviderId() {
+		return providerId;
 	}
 
-	public String getProviderId() { return providerId; }
+	public void addSource(String link, String serverId, String type) {
+		sources.add(new Source(link, serverId, type));
+	}
 
-	public String getServerId() { return serverId; }
+	public List<Source> getSources() { return sources; }
+
+	public String toJson() {
+		Gson gson = new Gson();
+		return gson.toJson(this);
+	}
+
+	public AnimeSource fromJson(String json) {
+		Gson gson = new Gson();
+		return gson.fromJson(json, AnimeSource.class);
+	}
+
+	public class Source {
+		private final String link;
+		private final String type;
+		private final String serverId;
+
+		public Source(String link, String serverId, String type) {
+			this.link = link;
+			this.type = type;
+			this.serverId = serverId;
+		}
+
+		public String getLink() {
+			return link;
+		}
+
+		public String getType() {
+			return type;
+		}
+
+		public String getServerId() {
+			return serverId;
+		}
+	}
 }

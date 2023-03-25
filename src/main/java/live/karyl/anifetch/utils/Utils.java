@@ -71,4 +71,8 @@ public class Utils {
         }
         return animeParsers;
     }
+
+    public static boolean checkEpisodeNumber(int episodeNumber, int currentEpisode) {
+        return Math.abs(episodeNumber - currentEpisode) <= 1;
+    }
 }

@@ -16,5 +16,12 @@ type Episode {
 }
 
 type AnimeSource {
+  providerId: ID # Provider ID
+  sources: [Source]
+}
+
+type Source {
   link: String # Link to the video
+  type: String # Type of the video
+  serverId: ID # Server ID
 }

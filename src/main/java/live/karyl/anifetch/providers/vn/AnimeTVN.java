@@ -85,54 +85,47 @@ public class AnimeTVN extends AnimeProvider {
 	@Override
 	public AnimeSource getLink(String value) {
 		try {
-			String link = "";
-			//String serverId = "";
+			AnimeSource sources = new AnimeSource(siteName);
 			String redisId = siteName + "$" + value;
 
 			if (redis.exists(redisId, "source")) {
-				link = redis.get(redisId, "source");
-				if (link != null) return new AnimeSource(link, siteName);
+				String jsonData = redis.get(redisId, "source");
+				return new Gson().fromJson(jsonData, AnimeSource.class);
 			}
 
 			JSONParser jsonParser = new JSONParser();
 			JSONObject links = (JSONObject) jsonParser.parse(requestPostGetLink(value, true));
 			JSONArray linksArray = (JSONArray) links.get("links");
-			String data = "";
+
 
 			for (var object : linksArray) {
 				JSONObject linksValue = (JSONObject) object;
-				if (linksValue.get("id").toString().equals(serverId)) {
-					String id = linksValue.get("id").toString();
-					String epLink = linksValue.get("link").toString();
-					String params = "{0},{1}"
-							.replace("{0}", id)
-							.replace("{1}", URLEncoder.encode(epLink, StandardCharsets.UTF_8));
-					String linkPlayer = requestPostGetLink(params, false);
-					data = (String) ((JSONObject) jsonParser.parse(linkPlayer)).get("link");
-					break;
-				}
-				switch (serverId) {
+				String id = linksValue.get("id").toString();
+				String epLink = linksValue.get("link").toString();
+				String params = "{0},{1}"
+						.replace("{0}", id)
+						.replace("{1}", URLEncoder.encode(epLink, StandardCharsets.UTF_8));
+				String linkPlayer = requestPostGetLink(params, false);
+				String data = (String) ((JSONObject) jsonParser.parse(linkPlayer)).get("link");
+				switch (id) {
 					case "20" -> {
 						URI uri = new URI(data);
 						String path = uri.getPath();
 						String fileID = path.substring(path.lastIndexOf("/") + 1);
 						var a = playHQB(fileID);
-						if (a != null) return new AnimeSource(a, siteName, "HQB");
+						if (a != null) sources.addSource(a,id, "hls");
+					}
+					case "13" -> {
+						var document = Utils.connect(data);
+						String patternString = "https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+						Pattern pattern = Pattern.compile(patternString);
+						Matcher matcher = pattern.matcher(document.html());
+						if (matcher.find()) sources.addSource(matcher.group(), id, "hls");
 					}
 				}
 			}
-
-			switch (serverId) {
-				case "20" -> {
-					URI uri = new URI(data);
-					String path = uri.getPath();
-					String fileID = path.substring(path.lastIndexOf("/") + 1);
-					var a = playHQB(fileID);
-					if (a != null) return new AnimeSource(a, siteName, "HQB");
-				}
-			}
-			redis.set(redisId, link, "source");
-			return null;
+			redis.set(redisId, sources.toJson(), "source");
+			return sources;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -179,13 +172,14 @@ public class AnimeTVN extends AnimeProvider {
 				year = Integer.parseInt(yearMatcher.group(1).split(" ")[1]);
 			}
 		}
+		System.out.println("debug:" + year + " " + anilistInfo.getReleaseDate() + " " + episode + " " + anilistInfo.getCurrentEpisode() + " " + Utils.matchedRate(title, anilistInfo.getTitle().romaji));
 		if (type.equals("english")) {
 			return year == anilistInfo.getReleaseDate()
-					&& episode == anilistInfo.getCurrentEpisode()
+					&& Utils.checkEpisodeNumber(episode, anilistInfo.getCurrentEpisode())
 					&& Utils.matchedRate(title, anilistInfo.getTitle().english) > 0.5;
 		}
 		return year == anilistInfo.getReleaseDate()
-				&& episode == anilistInfo.getCurrentEpisode()
+				&& Utils.checkEpisodeNumber(episode, anilistInfo.getCurrentEpisode())
 				&& Utils.matchedRate(title, anilistInfo.getTitle().romaji) > 0.5;
 	}
 
@@ -272,7 +266,7 @@ public class AnimeTVN extends AnimeProvider {
 	private static int extractNumberFromString(String s) {
 		if (s.contains("-")) {
 			return Integer.parseInt(s.split("-")[0]);
-		} else if (s.contains("_End ")) {
+		} else if (s.endsWith("_End")) {
 			return Integer.parseInt(s.replace("_End", ""));
 		} else if (s.contains(".")) {
 			return Integer.parseInt(Math.round(Double.parseDouble(s)) + "");

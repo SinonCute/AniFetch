@@ -20,12 +20,12 @@ public class GraphqlService {
 
 	@QueryMapping("source")
 	public AnimeSource source(@Argument String providerId, @Argument String value) {
-		System.out.println("Searching for " + value);
+		System.out.println("Getting source for " + providerId + " " + value);
 		switch (providerId) {
-			case "AnimeTVN" -> {
+			case "ATVN" -> {
 				return AniFetchApplication.getProviders().get("AnimeTVN").getLink(value);
 			}
-			case "WebLinhTinh" -> {
+			case "WLT" -> {
 				return AniFetchApplication.getProviders().get("WebLinhTinh").getLink(value);
 			}
 		}

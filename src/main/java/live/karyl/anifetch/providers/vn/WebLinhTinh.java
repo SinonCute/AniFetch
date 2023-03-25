@@ -87,12 +87,13 @@ public class WebLinhTinh extends AnimeProvider {
 
     @Override
     public AnimeSource getLink(String data) {
+        AnimeSource animeSource = new AnimeSource(siteName);
         String redisId = siteName + "$" + data;
-        String link = "";
+
 
         if (redis.exists(redisId, "source")) {
-            link = redis.get(redisId, "source");
-            if (link != null) return new AnimeSource(link, siteName);
+            String jsonData = redis.get(redisId, "source");
+            return new Gson().fromJson(jsonData, AnimeSource.class);
         }
 
         var value = data.split("\\$");
@@ -109,25 +110,32 @@ public class WebLinhTinh extends AnimeProvider {
 
             for (var a : sourcesArray) {
                 var sourceObject = a.getAsJsonObject();
-                link = sourceObject.get("file").getAsString();
-                redis.set(redisId, link, "source");
+                String link = sourceObject.get("file").getAsString();
+                animeSource.addSource(link, value[1], "hls");
             }
         }
-        return new AnimeSource(link, siteName);
+        redis.set(redisId, animeSource.toJson(), "source");
+        return animeSource;
     }
 
     private boolean compareResult(Document mainPage, AnilistInfo anilistInfo, String type) {
         try {
             var title = mainPage.select(".title-wrapper > .entry-title").text();
-            int year = Integer.parseInt(StringUtils.substringBetween(mainPage.select(".title-wrapper").html(), "(", ")"));
             int episode = Integer.parseInt(mainPage.select(".more-info").get(0).text().split("/")[0]);
+            int year;
+            if (mainPage.select(".title-wrapper").html().matches(".*\\(.*\\).*")) {
+                year = Integer.parseInt(StringUtils.substringBetween(mainPage.select(".title-wrapper").html(), "(", ")"));
+            } else {
+                year = anilistInfo.getReleaseDate();
+            }
+            System.out.println("debug:" + year + " " + anilistInfo.getReleaseDate() + " " + episode + " " + anilistInfo.getCurrentEpisode() + " " + Utils.matchedRate(title, anilistInfo.getTitle().romaji));
             if (type.equals("english")) {
                 return year == anilistInfo.getReleaseDate()
-                        && episode == anilistInfo.getCurrentEpisode()
+                        && Utils.checkEpisodeNumber(episode, anilistInfo.getCurrentEpisode())
                         && Utils.matchedRate(title, anilistInfo.getTitle().english) > 0.5;
             }
             return year == anilistInfo.getReleaseDate()
-                    && episode == anilistInfo.getCurrentEpisode()
+                    && Utils.checkEpisodeNumber(episode, anilistInfo.getCurrentEpisode())
                     && Utils.matchedRate(title, anilistInfo.getTitle().romaji) > 0.5;
         } catch (Exception e) {
             e.printStackTrace();

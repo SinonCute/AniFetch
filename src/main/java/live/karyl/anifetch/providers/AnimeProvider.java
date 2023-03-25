@@ -9,6 +9,8 @@ import live.karyl.anifetch.models.AnimeParser;
 import live.karyl.anifetch.models.AnimeSource;
 import live.karyl.anifetch.utils.Utils;
 
+import java.util.List;
+
 public abstract class AnimeProvider {
     protected final String siteName;
     protected final String baseUrl;

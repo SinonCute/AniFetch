@@ -43,6 +43,8 @@ public class SearchRequest {
 		try {
 			String searchURL = "https://weblinhtinh.net/wp-admin/admin-ajax.php";
 
+			if (key == null) return new String[0];
+
 			RequestBody requestBody = new FormBody.Builder()
 					.addEncoded("action", "halimthemes_ajax_search")
 					.addEncoded("search", key)
