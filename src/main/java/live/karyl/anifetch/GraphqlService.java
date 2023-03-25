@@ -15,7 +15,6 @@ public class GraphqlService {
 	@QueryMapping("anime")
 	public List<AnimeParser> episode(@Argument String id) {
 		System.out.println("Searching for " + id);
-
 		return Utils.searchAll(id);
 	}
 

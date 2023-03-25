@@ -2,6 +2,7 @@ package live.karyl.anifetch.providers.vn;
 
 import com.google.gson.Gson;
 import live.karyl.anifetch.models.AnilistInfo;
+import live.karyl.anifetch.models.AnimeEpisode;
 import live.karyl.anifetch.models.AnimeParser;
 import live.karyl.anifetch.models.AnimeSource;
 import live.karyl.anifetch.providers.AnimeProvider;
@@ -70,8 +71,8 @@ public class WebLinhTinh extends AnimeProvider {
         return animeParser;
     }
 
-    public List<String> extractEpisodeIds(String id) {
-        List<String> episodes = new ArrayList<>();
+    public List<AnimeEpisode> extractEpisodeIds(String id) {
+        List<AnimeEpisode> episodes = new ArrayList<>();
         var response = requestPostGetLink(new String[]{"", "", id}, "getEpisode");
         if (response == null) return episodes;
         var document = Jsoup.parse(response);
@@ -79,7 +80,7 @@ public class WebLinhTinh extends AnimeProvider {
             String episode = a.attr("data-episode");
             String server = a.attr("data-server");
             String postid = a.attr("data-post-id");
-            episodes.add(episode + "$" + server + "$" + postid);
+            episodes.add(new AnimeEpisode(Integer.parseInt(episode), episode + "$" + server + "$" + postid));
         }
         return episodes;
     }
@@ -91,7 +92,7 @@ public class WebLinhTinh extends AnimeProvider {
 
         if (redis.exists(redisId, "source")) {
             link = redis.get(redisId, "source");
-            if (link != null) return new AnimeSource(link);
+            if (link != null) return new AnimeSource(link, siteName);
         }
 
         var value = data.split("\\$");
@@ -112,22 +113,26 @@ public class WebLinhTinh extends AnimeProvider {
                 redis.set(redisId, link, "source");
             }
         }
-        return new AnimeSource(link);
+        return new AnimeSource(link, siteName);
     }
 
     private boolean compareResult(Document mainPage, AnilistInfo anilistInfo, String type) {
-        var title = mainPage.select(".title-wrapper > .entry-title").text();
-        int year = Integer.parseInt(StringUtils.substringBetween(mainPage.select(".title-wrapper").html(), "(", ")"));
-        int episode = Integer.parseInt(mainPage.select(".more-info").get(0).text().split("/")[0]);
-        System.out.println(title + " " + year + " " + episode);
-        if (type.equals("english")) {
+        try {
+            var title = mainPage.select(".title-wrapper > .entry-title").text();
+            int year = Integer.parseInt(StringUtils.substringBetween(mainPage.select(".title-wrapper").html(), "(", ")"));
+            int episode = Integer.parseInt(mainPage.select(".more-info").get(0).text().split("/")[0]);
+            if (type.equals("english")) {
+                return year == anilistInfo.getReleaseDate()
+                        && episode == anilistInfo.getCurrentEpisode()
+                        && Utils.matchedRate(title, anilistInfo.getTitle().english) > 0.5;
+            }
             return year == anilistInfo.getReleaseDate()
                     && episode == anilistInfo.getCurrentEpisode()
-                    && Utils.matchedRate(title, anilistInfo.getTitle().english) > 0.5;
+                    && Utils.matchedRate(title, anilistInfo.getTitle().romaji) > 0.5;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
-        return year == anilistInfo.getReleaseDate()
-                && episode == anilistInfo.getCurrentEpisode()
-                && Utils.matchedRate(title, anilistInfo.getTitle().romaji) > 0.5;
     }
 
     public String requestPostGetLink(String[] data, String actionType) {

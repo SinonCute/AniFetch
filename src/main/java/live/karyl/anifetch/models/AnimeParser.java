@@ -9,7 +9,7 @@ public class AnimeParser {
 	private final String providerId;
 	private final String providerName;
 
-	private final List<Episode> episodes;
+	private List<AnimeEpisode> episodes;
 
 	public AnimeParser(String animeId, String providerId, String providerName) {
 		this.animeId = animeId;
@@ -26,17 +26,14 @@ public class AnimeParser {
 		return providerId;
 	}
 
-	public List<Episode> getEpisodes() {
+	public List<AnimeEpisode> getEpisodes() {
 		return episodes;
 	}
 
 	public String getProviderName() { return providerName; }
 
-	public void setEpisodes(List<String> episodesId) {
-		episodes.clear();
-		for (int i = 0; i < episodesId.size(); i++) {
-			episodes.add(new Episode(i + 1, episodesId.get(i)));
-		}
+	public void setEpisodes(List<AnimeEpisode> episodes) {
+		this.episodes = episodes;
 	}
 
 	public String toJson() {
@@ -48,6 +45,4 @@ public class AnimeParser {
 		Gson gson = new Gson();
 		return gson.fromJson(json, AnimeParser.class);
 	}
-
-	public record Episode(int episodeNumber, String value) {}
 }

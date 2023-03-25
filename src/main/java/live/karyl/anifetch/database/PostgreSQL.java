@@ -11,9 +11,9 @@ public class PostgreSQL {
 
     private Connection sql;
 
-    private static final String INSERT_ANIME = "INSERT INTO anime (anime_id, provider_id, provider) VALUES (?, ?, ?) ON CONFLICT (anime_id) DO UPDATE SET provider_id = EXCLUDED.provider_id, provider = EXCLUDED.provider;";
+    private static final String INSERT_ANIME = "INSERT INTO anime (anime_id, provider_id, provider_name) VALUES (?, ?, ?)";
 
-    private static final String SELECT_ANIME = "SELECT * FROM anime WHERE anime_id = ? AND provider = ?";
+    private static final String SELECT_ANIME = "SELECT * FROM anime WHERE anime_id = ? AND provider_name = ?";
 
     public void init() {
         try {
@@ -21,7 +21,8 @@ public class PostgreSQL {
             config.setJdbcUrl("jdbc:postgresql://db.myvhzegeowsapjobfptt.supabase.co:5432/postgres");
             config.setUsername("postgres");
             config.setPassword("Hiencaokgkg@@");
-            config.setMaximumPoolSize(10);
+            config.addDataSourceProperty("cachePrepStmts", "true");
+            config.addDataSourceProperty("prepStmtCacheSize", "250");
             config.setConnectionTimeout(10000);
             HikariDataSource ds = new HikariDataSource(config);
             sql = ds.getConnection();
@@ -62,14 +63,12 @@ public class PostgreSQL {
         } catch (SQLException e) {
             e.printStackTrace();
             Logger.error("SQLException on addAnime", e);
-        } finally {
-            cleanup(null, statement);
         }
     }
 
     public String getAnimeFetch(String animeId, String provider) {
-        PreparedStatement statement = null;
-        ResultSet result = null;
+        PreparedStatement statement;
+        ResultSet result;
         try {
             statement = sql.prepareStatement(SELECT_ANIME);
             statement.setString(1, animeId);
@@ -81,8 +80,6 @@ public class PostgreSQL {
         } catch (SQLException e) {
             e.printStackTrace();
             Logger.error("SQLException on providerId", e);
-        } finally {
-            cleanup(result, statement);
         }
         return null;
     }

@@ -31,7 +31,7 @@ public class SearchRequest {
 			}
 			Document doc = Jsoup.parse(response.body().string());
 			Elements elements = doc.select(".film-list > .film_item > .film_item_inner > a");
-			System.out.println(elements.size() + " results");
+			System.out.println(elements.size() + " results on WebLinhTinh");
 			return elements.stream().map(element -> element.attr("href")).toArray(String[]::new);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -59,7 +59,7 @@ public class SearchRequest {
 			}
 			Document doc = Jsoup.parse(response.body().string());
 			Elements elements = doc.select(".exact_result > a");
-			System.out.println(elements.size() + " results");
+			System.out.println(elements.size() + " results on AnimeTVN" );
 			return elements.stream().map(element -> element.attr("href")).toArray(String[]::new);
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -8,12 +8,16 @@ public class Redis {
 
 	public void init() {
 		jedis = new Jedis("localhost", 6379);
-		System.out.println("Redis connection established");
+		//jedis.connect();
+		if (!jedis.isConnected()) {
+			System.out.println("Redis is not connected");
+		} else {
+			System.out.println("Redis is connected");
+		}
 	}
 
 	public void set(String key, String value, String type) {
 		if (!jedis.isConnected()) return;
-		System.out.println("Setting " + key + " to " + value);
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
@@ -30,7 +34,6 @@ public class Redis {
 
 	public String get(String key, String type) {
 		if (!jedis.isConnected()) return null;
-		System.out.println("Getting " + key + " from redis");
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
@@ -46,7 +49,6 @@ public class Redis {
 
 	public boolean exists(String key, String type) {
 		if (!jedis.isConnected()) return false;
-		System.out.println("Checking if " + key + " exists");
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
@@ -74,9 +76,7 @@ public class Redis {
 	}
 
 	public void deleteAll() {
-		jedis.del("search:*");
-		jedis.del("provider:*");
-		jedis.del("source:*");
+		jedis.flushAll();
 	}
 
 }
