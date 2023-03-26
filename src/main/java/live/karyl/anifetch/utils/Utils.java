@@ -40,7 +40,6 @@ public class Utils {
         int retry = 5;
         int timeout = 5000;
         Document document = null;
-        //Logger.debug("Connect to " + url);
         while (retry > 0) {
             try {
                 document = Jsoup.connect(url)

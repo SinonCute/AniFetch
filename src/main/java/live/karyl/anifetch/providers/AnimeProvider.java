@@ -30,4 +30,16 @@ public abstract class AnimeProvider {
     public abstract AnimeParser search(AnilistInfo anilistInfo);
 
     public abstract AnimeSource getLink(String value);
+
+    protected static int extractNumberFromString(String s) {
+        if (s.contains("-")) {
+            return Integer.parseInt(s.split("-")[0]);
+        } else if (s.endsWith("_End")) {
+            return Integer.parseInt(s.replace("_End", ""));
+        } else if (s.contains(".")) {
+            return Integer.parseInt(Math.round(Double.parseDouble(s)) + "");
+        } else {
+            return Integer.parseInt(s);
+        }
+    }
 }

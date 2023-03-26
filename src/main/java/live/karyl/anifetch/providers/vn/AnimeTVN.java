@@ -171,7 +171,6 @@ public class AnimeTVN extends AnimeProvider {
 				year = Integer.parseInt(yearMatcher.group(1).split(" ")[1]);
 			}
 		}
-		System.out.println("debug:" + year + " " + anilistInfo.getReleaseDate() + " " + episode + " " + anilistInfo.getCurrentEpisode() + " " + Utils.matchedRate(title, anilistInfo.getTitle().romaji));
 		if (type.equals("english")) {
 			return year == anilistInfo.getReleaseDate()
 					&& Utils.checkNumberEqual(episode, anilistInfo.getCurrentEpisode())
@@ -258,19 +257,6 @@ public class AnimeTVN extends AnimeProvider {
 			response.close();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-	}
-
-	//stupid animetvn
-	private static int extractNumberFromString(String s) {
-		if (s.contains("-")) {
-			return Integer.parseInt(s.split("-")[0]);
-		} else if (s.endsWith("_End")) {
-			return Integer.parseInt(s.replace("_End", ""));
-		} else if (s.contains(".")) {
-			return Integer.parseInt(Math.round(Double.parseDouble(s)) + "");
-		} else {
-			return Integer.parseInt(s);
 		}
 	}
 }

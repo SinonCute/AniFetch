@@ -92,7 +92,7 @@ public class AnimeHay extends AnimeProvider {
 			if (link.contains("suckplayer")) {
 				var data = firePlayer(link);
 				if (data != null) {
-					var source = new AnimeSource.Source(data[0], "suckplayer", "mp4");
+					var source = new AnimeSource.Source(data[0], "suckplayer", "hls");
 					source.addHeader(data[1]);
 					animeSource.addSource(source);
 				}
@@ -101,6 +101,7 @@ public class AnimeHay extends AnimeProvider {
 				animeSource.addSource(link, "facebook", "mp4");
 			}
 		}
+		redis.set(redisId, animeSource.toJson(), "source");
 		return animeSource;
 	}
 
@@ -119,8 +120,6 @@ public class AnimeHay extends AnimeProvider {
 			episode = episodeElement.size();
 		}
 
-		System.out.println("debug:" + year + " " + anilistInfo.getReleaseDate() + " " + episode + " " + anilistInfo.getCurrentEpisode() + " " + Utils.matchedRate(title, anilistInfo.getTitle().romaji));
-
 		if (type.equals("english")) {
 			return year == anilistInfo.getReleaseDate()
 					&& Utils.checkNumberEqual(episode, anilistInfo.getCurrentEpisode())
@@ -138,11 +137,14 @@ public class AnimeHay extends AnimeProvider {
 		if (mainPage == null) return null;
 		var episodeElement = mainPage.select("div.ah_content > div.info-movie > " +
 				"div.body > div.list_episode.ah-frame-bg > div.list-item-episode.scroll-bar > a");
-		episodeElement.forEach(element -> {
+
+		// reverse order
+		for (int i = episodeElement.size() - 1; i >= 0; i--) {
+			var element = episodeElement.get(i);
 			var id = element.attr("href").replaceAll("^.*-(\\d+)\\.html$", "$1");
-			var number = element.text();
-			episodes.add(new AnimeEpisode(Integer.parseInt(number), id));
-		});
+			var number = extractNumberFromString(element.text());
+			episodes.add(new AnimeEpisode(number, id));
+		}
 		return episodes;
 	}
 
