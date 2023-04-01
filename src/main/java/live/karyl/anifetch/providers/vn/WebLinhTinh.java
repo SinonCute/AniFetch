@@ -36,8 +36,8 @@ public class WebLinhTinh extends AnimeProvider {
         titles.put("english", anilistInfo.getTitle().english);
         titles.put("romaji", anilistInfo.getTitle().romaji);
 
-        if (redis.exists(redisId, "search")) {
-            animeParser = new Gson().fromJson(redis.get(redisId, "search"), AnimeParser.class);
+        if (redis.exists(redisId, REDIS_SEARCH)) {
+            animeParser = new Gson().fromJson(redis.get(redisId, REDIS_SEARCH), AnimeParser.class);
             if (animeParser != null) return animeParser;
         }
 
@@ -46,7 +46,7 @@ public class WebLinhTinh extends AnimeProvider {
             var episodes = extractEpisodeIds(id);
             animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
             animeParser.setEpisodes(episodes);
-            redis.set(redisId, animeParser.toJson(), "search");
+            redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
             return animeParser;
         }
 
@@ -56,7 +56,7 @@ public class WebLinhTinh extends AnimeProvider {
             var searchResults = SearchRequest.webLinhTinh(title);
             if (searchResults == null) continue;
             for (var searchResult : searchResults) {
-                var mainPage = Utils.connect(searchResult);
+                var mainPage = connect(searchResult, siteName, "");
                 System.out.println(searchResult);
                 if (compareResult(mainPage, anilistInfo, key)) {
                     var id = mainPage.select("#bookmark").attr("data-id");
@@ -68,7 +68,7 @@ public class WebLinhTinh extends AnimeProvider {
             }
         }
         if (animeParser == null) return null;
-        redis.set(redisId, animeParser.toJson(), "search");
+        redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
         return animeParser;
     }
 
@@ -92,8 +92,8 @@ public class WebLinhTinh extends AnimeProvider {
         String redisId = siteName + "$" + data;
 
 
-        if (redis.exists(redisId, "source")) {
-            String jsonData = redis.get(redisId, "source");
+        if (redis.exists(redisId, REDIS_SOURCE)) {
+            String jsonData = redis.get(redisId, REDIS_SOURCE);
             return new Gson().fromJson(jsonData, AnimeSource.class);
         }
 
@@ -115,7 +115,7 @@ public class WebLinhTinh extends AnimeProvider {
                 animeSource.addSource(link, value[1], "hls");
             }
         }
-        redis.set(redisId, animeSource.toJson(), "source");
+        redis.set(redisId, animeSource.toJson(), REDIS_SOURCE);
         return animeSource;
     }
 

@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 public class SearchRequest {
 
 	private static final String PROXY_VN = "https://proxy-vn.karyl.live/v1/server/proxy?link=";
+	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
 
 	public static String[] animeTVN(String key, String year, String[] token) {
 		try {
@@ -97,7 +98,9 @@ public class SearchRequest {
 
 			String searchURL = "https://animehay.live/tim-kiem/" + URLEncoder.encode(key.replaceAll(" ", "-"), StandardCharsets.UTF_8) + ".html";
 			Request request = new Request.Builder()
-					.url(PROXY_VN + searchURL)
+					.url(searchURL)
+					.addHeader("User-Agent", USER_AGENT)
+					.addHeader("Cookie", "cf_clearance=qAUxm5MmaZHZWlgeXtKpgt4A2fcmz8VrMq9dMJBWhII-1678686086-0-160")
 					.build();
 			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
 			if (response.code() != 200) {
@@ -107,6 +110,40 @@ public class SearchRequest {
 			Document doc = Jsoup.parse(response.body().string());
 			Elements elements = doc.select(".movies-list > .movie-item > a");
 			System.out.println(elements.size() + " results on AnimeHay");
+			return elements.stream().map(element -> element.attr("href")).toArray(String[]::new);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static String[] animeVietsub(String key, String Cookie) {
+		try {
+			String searchURL = "https://animevietsub.in/ajax/suggest";
+
+			if (key == null) return new String[0];
+
+			RequestBody requestBody = new FormBody.Builder()
+					.addEncoded("ajaxSearch", "1")
+					.addEncoded("keysearch", key)
+					.build();
+			Request request = new Request.Builder()
+					.url(searchURL)
+					.post(requestBody)
+					.addHeader("x-requested-with", "XMLHttpRequest")
+					.addHeader("user-agent", USER_AGENT)
+					.addHeader("Cookie", Cookie)
+					.build();
+
+			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
+			if (response.code() != 200) {
+				System.out.println("Request failed");
+				return null;
+			}
+
+			Document doc = Jsoup.parse(response.body().string());
+			Elements elements = doc.select(".ss-info > a");
+			System.out.println(elements.size() + " results on animeVietsub" );
 			return elements.stream().map(element -> element.attr("href")).toArray(String[]::new);
 		} catch (IOException e) {
 			e.printStackTrace();

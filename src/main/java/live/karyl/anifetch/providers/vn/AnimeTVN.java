@@ -45,8 +45,8 @@ public class AnimeTVN extends AnimeProvider {
 		titles.put("english", anilistInfo.getTitle().english);
 		titles.put("romaji", anilistInfo.getTitle().romaji);
 
-		if (redis.exists(redisId, "search")) {
-			animeParser = new Gson().fromJson(redis.get(redisId, "search"), AnimeParser.class);
+		if (redis.exists(redisId, REDIS_SEARCH)) {
+			animeParser = new Gson().fromJson(redis.get(redisId, REDIS_SEARCH), AnimeParser.class);
 			if (animeParser != null) return animeParser;
 		}
 
@@ -55,18 +55,18 @@ public class AnimeTVN extends AnimeProvider {
 			var episodes = extractEpisodeIds("https://animetvn.xyz/thong-tin-phim/f" + id + "-a.html");
 			animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
 			animeParser.setEpisodes(episodes);
-			redis.set(redisId, animeParser.toJson(), "search");
+			redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
 			return animeParser;
 		}
 
-		for (String key : titles.keySet()) {
-			String title = titles.get(key);
+		for (var entry : titles.entrySet()) {
+			String title = entry.getValue();
 			if (animeParser != null) break;
 			if (title == null) continue;
 			var searchResults = SearchRequest.animeTVN(title, anilistInfo.getReleaseDate() + "", token);
 			if (searchResults == null) continue;
 			for (var searchResult : searchResults) {
-				if (compareResult(anilistInfo, searchResult, key)) {
+				if (compareResult(anilistInfo, searchResult, entry.getKey())) {
 					String id = searchResult.replaceAll("^.*f(\\d+).*$", "$1");
 					var episodes = extractEpisodeIds(searchResult);
 					animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
@@ -77,7 +77,7 @@ public class AnimeTVN extends AnimeProvider {
 			}
 		}
 		if (animeParser == null) return null;
-		redis.set(redisId, animeParser.toJson(), "search");
+		redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
 		return animeParser;
 	}
 
@@ -87,8 +87,8 @@ public class AnimeTVN extends AnimeProvider {
 			AnimeSource sources = new AnimeSource(siteName);
 			String redisId = siteName + "$" + value;
 
-			if (redis.exists(redisId, "source")) {
-				String jsonData = redis.get(redisId, "source");
+			if (redis.exists(redisId, REDIS_SOURCE)) {
+				String jsonData = redis.get(redisId, REDIS_SOURCE);
 				return new Gson().fromJson(jsonData, AnimeSource.class);
 			}
 
@@ -112,10 +112,10 @@ public class AnimeTVN extends AnimeProvider {
 						String path = uri.getPath();
 						String fileID = path.substring(path.lastIndexOf("/") + 1);
 						var a = playHQB(fileID);
-						if (a != null) sources.addSource(a,id, "hls");
+						if (a != null) sources.addSource(a, id, "hls");
 					}
 					case "13" -> {
-						var document = Utils.connect(data);
+						var document = connect(data, siteName, "");
 						String patternString = "https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
 						Pattern pattern = Pattern.compile(patternString);
 						Matcher matcher = pattern.matcher(document.html());
@@ -123,7 +123,7 @@ public class AnimeTVN extends AnimeProvider {
 					}
 				}
 			}
-			redis.set(redisId, sources.toJson(), "source");
+			redis.set(redisId, sources.toJson(), REDIS_SOURCE);
 			return sources;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -132,10 +132,10 @@ public class AnimeTVN extends AnimeProvider {
 	}
 
 	private List<AnimeEpisode> extractEpisodeIds(String link) {
-		var mainPage = Utils.connect(link);
+		var mainPage = connect(link, siteName, "");
 		if (mainPage.select(".play-now").isEmpty()) return null;
 		var watchUrl = mainPage.select(".play-now").get(0).attr("href");
-		var watchPage = Utils.connect(watchUrl);
+		var watchPage = connect(watchUrl, siteName, "");
 
 		List<AnimeEpisode> episodes = new ArrayList<>();
 
@@ -154,7 +154,7 @@ public class AnimeTVN extends AnimeProvider {
 	}
 
 	private boolean compareResult(AnilistInfo anilistInfo, String link, String type) {
-		Document document = Utils.connect(link);
+		Document document = connect(link, siteName, "");
 		String title = document.select(".name-vi").first().text();
 		int year = 0;
 		int episode = 0;

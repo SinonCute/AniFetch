@@ -8,7 +8,7 @@ public class Redis {
 
 	public void init() {
 		jedis = new Jedis("localhost", 6379);
-		//jedis.connect();
+		jedis.connect();
 		if (!jedis.isConnected()) {
 			System.out.println("Redis is not connected");
 		} else {
@@ -79,5 +79,4 @@ public class Redis {
 		jedis.del("search:*");
 		jedis.del("source:*");
 	}
-
 }

@@ -6,6 +6,7 @@ import live.karyl.anifetch.database.Redis;
 import live.karyl.anifetch.providers.AnimeProvider;
 import live.karyl.anifetch.providers.vn.AnimeHay;
 import live.karyl.anifetch.providers.vn.AnimeTVN;
+import live.karyl.anifetch.providers.vn.AnimeVietsub;
 import live.karyl.anifetch.providers.vn.WebLinhTinh;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -41,6 +42,7 @@ public class AniFetchApplication {
 		providers.put("AnimeTVN", new AnimeTVN());
 		providers.put("WebLinhTinh", new WebLinhTinh());
 		providers.put("AnimeHay", new AnimeHay());
+		providers.put("AnimeVietsub", new AnimeVietsub());
 	}
 
 	public static OkHttp getConnection() {

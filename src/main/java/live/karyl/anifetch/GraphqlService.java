@@ -2,6 +2,7 @@ package live.karyl.anifetch;
 
 import live.karyl.anifetch.models.AnimeParser;
 import live.karyl.anifetch.models.AnimeSource;
+import live.karyl.anifetch.models.Results;
 import live.karyl.anifetch.utils.Utils;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -13,9 +14,13 @@ import java.util.List;
 public class GraphqlService {
 
 	@QueryMapping("anime")
-	public List<AnimeParser> episode(@Argument String id) {
+	public Results episode(@Argument String id) {
 		System.out.println("Searching for " + id);
-		return Utils.searchAll(id);
+		List<AnimeParser> animeParsers = Utils.searchAll(id);
+		if (animeParsers.isEmpty()) {
+			return new Results(0, false, null);
+		}
+		return new Results(animeParsers.size(), true, animeParsers);
 	}
 
 	@QueryMapping("source")
@@ -31,8 +36,13 @@ public class GraphqlService {
 			case "AH" -> {
 				return AniFetchApplication.getProviders().get("AnimeHay").getLink(value);
 			}
+			case "AV" -> {
+				return AniFetchApplication.getProviders().get("AnimeVietsub").getLink(value);
+			}
+			default -> {
+				return null;
+			}
 		}
-		return null;
 	}
 }
 

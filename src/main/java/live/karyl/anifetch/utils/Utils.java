@@ -36,14 +36,15 @@ public class Utils {
         }
     }
 
-    public static Document connect(String url) {
+    public static Document connect(String url, String cookie) {
         int retry = 5;
         int timeout = 5000;
         Document document = null;
         while (retry > 0) {
             try {
                 document = Jsoup.connect(url)
-                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36")
+                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36")
+                        .header("Cookie", cookie)
                         .timeout(timeout)
                         .get();
                 break;
@@ -65,9 +66,9 @@ public class Utils {
         List<AnimeParser> animeParsers = new ArrayList<>();
         for (var provider : AniFetchApplication.getProviders().values()) {
             var animeParser = provider.search(anilistInfo);
-            if (animeParser != null) {
-                animeParsers.add(animeParser);
-            }
+            if (animeParser == null) continue;
+            if (animeParser.getEpisodes() == null) continue;
+            animeParsers.add(animeParser);
         }
         return animeParsers;
     }
