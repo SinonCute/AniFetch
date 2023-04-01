@@ -57,6 +57,7 @@ public class WebLinhTinh extends AnimeProvider {
             if (searchResults == null) continue;
             for (var searchResult : searchResults) {
                 var mainPage = Utils.connect(searchResult);
+                System.out.println(searchResult);
                 if (compareResult(mainPage, anilistInfo, key)) {
                     var id = mainPage.select("#bookmark").attr("data-id");
                     animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
@@ -121,21 +122,12 @@ public class WebLinhTinh extends AnimeProvider {
     private boolean compareResult(Document mainPage, AnilistInfo anilistInfo, String type) {
         try {
             var title = mainPage.select(".title-wrapper > .entry-title").text();
-            int episode = Integer.parseInt(mainPage.select(".more-info").get(0).text().split("/")[0]);
-            int year;
-            if (mainPage.select(".title-wrapper").html().matches(".*\\(.*\\).*")) {
-                year = Integer.parseInt(StringUtils.substringBetween(mainPage.select(".title-wrapper").html(), "(", ")"));
-            } else {
-                year = anilistInfo.getReleaseDate();
-            }
-            System.out.println("debug:" + year + " " + anilistInfo.getReleaseDate() + " " + episode + " " + anilistInfo.getCurrentEpisode() + " " + Utils.matchedRate(title, anilistInfo.getTitle().romaji));
+            int episode = mainPage.select(".halim-list-eps > li").size();
             if (type.equals("english")) {
-                return year == anilistInfo.getReleaseDate()
-                        && Utils.checkNumberEqual(episode, anilistInfo.getCurrentEpisode())
+                return  Utils.checkNumberEqual(episode, anilistInfo.getCurrentEpisode())
                         && Utils.matchedRate(title, anilistInfo.getTitle().english) > 0.5;
             }
-            return year == anilistInfo.getReleaseDate()
-                    && Utils.checkNumberEqual(episode, anilistInfo.getCurrentEpisode())
+            return Utils.checkNumberEqual(episode, anilistInfo.getCurrentEpisode())
                     && Utils.matchedRate(title, anilistInfo.getTitle().romaji) > 0.5;
         } catch (Exception e) {
             e.printStackTrace();

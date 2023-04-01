@@ -99,7 +99,6 @@ public class SearchRequest {
 			Request request = new Request.Builder()
 					.url(PROXY_VN + searchURL)
 					.build();
-			System.out.println("Requesting " + searchURL);
 			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
 			if (response.code() != 200) {
 				System.out.println("Request failed");

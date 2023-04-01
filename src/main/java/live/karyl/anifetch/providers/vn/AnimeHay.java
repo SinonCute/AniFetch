@@ -59,7 +59,6 @@ public class AnimeHay extends AnimeProvider {
 			if (searchResults == null) continue;
 			for (var searchResult : searchResults) {
 				var mainPage = Utils.connect(PROXY_VN + searchResult);
-				System.out.println("debug:" + searchResult);
 				if (compareResult(anilistInfo, mainPage, key)) {
 					var id = searchResult.replaceAll("^.*-(\\d+)\\.html$", "$1");
 					var episodes = extractEpisodeIds(searchResult);

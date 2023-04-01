@@ -143,7 +143,7 @@ public class AnimeTVN extends AnimeProvider {
 			if (server.select(".svname").text().equalsIgnoreCase("Trailer")) continue;
 			for (var ep : server.select("a.tapphim")) {
 				var id = ep.attr("id").split("_")[1];
-				var episodeNumber = Math.round(extractNumberFromString(ep.text()));
+				var episodeNumber = extractNumberFromString(ep.text());
 				episodes.add(new AnimeEpisode(episodeNumber, id));
 			}
 		}
