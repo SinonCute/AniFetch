@@ -1,5 +1,6 @@
 package live.karyl.anifetch;
 
+import live.karyl.anifetch.config.ConfigManager;
 import live.karyl.anifetch.connection.OkHttp;
 import live.karyl.anifetch.database.PostgreSQL;
 import live.karyl.anifetch.database.Redis;
@@ -11,6 +12,11 @@ import live.karyl.anifetch.providers.vn.WebLinhTinh;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import javax.script.ScriptException;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,9 +26,14 @@ public class AniFetchApplication {
 	private static OkHttp connection;
 	private static Redis redis;
 	private static PostgreSQL postgreSQL;
+	private static ConfigManager config;
+
 	private static final Map<String, AnimeProvider> providers = new HashMap<>();
 
 	public static void main(String[] args) {
+
+		config = new ConfigManager();
+		config.init();
 
 		connection = new OkHttp();
 		connection.init();
@@ -45,6 +56,17 @@ public class AniFetchApplication {
 		providers.put("AnimeVietsub", new AnimeVietsub());
 	}
 
+	public static File getDataFolder() {
+		Path path = Paths.get(System.getProperty("user.dir"), "config");
+		File file = path.toFile();
+		if (!file.exists()) file.mkdirs();
+		return file;
+	}
+
+	public static InputStream getResourceAsStream(String name) {
+		return AniFetchApplication.class.getClassLoader().getResourceAsStream(name);
+	}
+
 	public static OkHttp getConnection() {
 		return connection;
 	}
@@ -54,4 +76,6 @@ public class AniFetchApplication {
 	public static Redis getRedis() { return redis; }
 
 	public static PostgreSQL getPostgreSQL() { return postgreSQL; }
+
+	public static ConfigManager getConfig() { return config; }
 }

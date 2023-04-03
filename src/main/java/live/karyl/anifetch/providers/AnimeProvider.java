@@ -1,6 +1,7 @@
 package live.karyl.anifetch.providers;
 
 import live.karyl.anifetch.AniFetchApplication;
+import live.karyl.anifetch.config.ConfigManager;
 import live.karyl.anifetch.connection.OkHttp;
 import live.karyl.anifetch.database.PostgreSQL;
 import live.karyl.anifetch.database.Redis;
@@ -10,7 +11,6 @@ import live.karyl.anifetch.models.AnimeSource;
 import live.karyl.anifetch.utils.Utils;
 import org.jsoup.nodes.Document;
 
-import java.util.List;
 import java.util.Locale;
 
 public abstract class AnimeProvider {
@@ -27,8 +27,9 @@ public abstract class AnimeProvider {
 	protected final OkHttp connection = AniFetchApplication.getConnection();
 	protected final Redis redis = AniFetchApplication.getRedis();
 	protected final PostgreSQL postgreSQL = AniFetchApplication.getPostgreSQL();
+	protected final ConfigManager config = AniFetchApplication.getConfig();
 
-	public AnimeProvider(String siteName, String baseUrl) {
+	protected AnimeProvider(String siteName, String baseUrl) {
 		this.siteName = siteName;
 		this.baseUrl = baseUrl;
 	}
@@ -40,7 +41,7 @@ public abstract class AnimeProvider {
 	protected Document connect(String url, String siteName, String cookie) {
 		switch (siteName) {
 			case "AnimeHay", "AnimeVietsub" -> {
-				return Utils.connect(url, cookie);
+				return Utils.connect(PROXY_VN + url, cookie);
 			}
 			default -> {
 				return Utils.connect(url, "");

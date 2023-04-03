@@ -56,7 +56,7 @@ public class AnimeHay extends AnimeProvider {
 		for (var entry : titles.entrySet()) {
 			var title = entry.getValue();
 			if (animeParser != null) continue;
-			var searchResults = SearchRequest.animeHay(title);
+			var searchResults = SearchRequest.animeHay(title, COOKIE);
 			if (searchResults == null) continue;
 			for (var searchResult : searchResults) {
 				var mainPage = connect(searchResult, siteName, COOKIE);

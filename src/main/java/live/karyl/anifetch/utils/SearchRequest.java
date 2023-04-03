@@ -70,7 +70,7 @@ public class SearchRequest {
 
 			RequestBody requestBody = new FormBody.Builder()
 					.addEncoded("action", "halimthemes_ajax_search")
-					.addEncoded("search", key)
+					.addEncoded("search", key.replaceAll("[^a-zA-Z\\s]", ""))
 					.build();
 			Request request = new Request.Builder()
 					.url(searchURL)
@@ -92,15 +92,15 @@ public class SearchRequest {
 		}
 	}
 
-	public static String[] animeHay(String key) {
+	public static String[] animeHay(String key, String cookie) {
 		try {
 			if (key == null) return new String[0];
-
-			String searchURL = "https://animehay.live/tim-kiem/" + URLEncoder.encode(key.replaceAll(" ", "-"), StandardCharsets.UTF_8) + ".html";
+			String keyEncoded = URLEncoder.encode(key.replaceAll(" ", "-"), StandardCharsets.UTF_8);
+			String searchURL = PROXY_VN + "https://animehay.live/tim-kiem/" + keyEncoded + ".html";
 			Request request = new Request.Builder()
 					.url(searchURL)
 					.addHeader("User-Agent", USER_AGENT)
-					.addHeader("Cookie", "cf_clearance=qAUxm5MmaZHZWlgeXtKpgt4A2fcmz8VrMq9dMJBWhII-1678686086-0-160")
+					.addHeader("Cookie", cookie)
 					.build();
 			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
 			if (response.code() != 200) {
@@ -119,7 +119,7 @@ public class SearchRequest {
 
 	public static String[] animeVietsub(String key, String Cookie) {
 		try {
-			String searchURL = "https://animevietsub.in/ajax/suggest";
+			String searchURL = PROXY_VN + "https://animevietsub.in/ajax/suggest";
 
 			if (key == null) return new String[0];
 

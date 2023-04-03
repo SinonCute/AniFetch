@@ -12,11 +12,16 @@ repositories {
     mavenCentral()
 }
 
+setMainClassName('live.karyl.anifetch.AniFetchApplication')
+
 dependencies {
     //spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-graphql'
 
+    //idk
+    implementation "org.bspfsystems:yamlconfiguration:1.3.0"
+    implementation 'org.openjdk.nashorn:nashorn-core:15.0'
 
     //connection
     implementation 'org.jsoup:jsoup:1.15.3'
