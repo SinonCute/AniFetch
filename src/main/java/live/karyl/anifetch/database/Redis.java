@@ -1,15 +1,19 @@
 package live.karyl.anifetch.database;
 
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 public class Redis {
 
-	private Jedis jedis;
+	private JedisPool jedisPool;
 
 	public void init() {
-		jedis = new Jedis("localhost", 6379);
-		//jedis.connect();
-		if (!jedis.isConnected()) {
+		JedisPoolConfig config = new JedisPoolConfig();
+		config.setMaxTotal(128);
+		config.setMaxIdle(128);
+		config.setMinIdle(16);
+		jedisPool = new JedisPool(config, "100.100.187.19", 6379, 10000);
+		if (!isConnected()) {
 			System.out.println("Redis is not connected");
 		} else {
 			System.out.println("Redis is connected");
@@ -17,7 +21,9 @@ public class Redis {
 	}
 
 	public void set(String key, String value, String type) {
-		if (!jedis.isConnected()) return;
+		if (!isConnected()) return;
+		System.out.println("SET | " + key + " - " + type + "");
+		var jedis = jedisPool.getResource();
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
@@ -33,7 +39,9 @@ public class Redis {
 	}
 
 	public String get(String key, String type) {
-		if (!jedis.isConnected()) return null;
+		if (!isConnected()) return null;
+		System.out.println("GET | " + key + " - " + type + "");
+		var jedis = jedisPool.getResource();
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
@@ -48,7 +56,9 @@ public class Redis {
 	}
 
 	public boolean exists(String key, String type) {
-		if (!jedis.isConnected()) return false;
+		if (!isConnected()) return false;
+		System.out.println("EXISTS | " + key + " - " + type + "");
+		var jedis = jedisPool.getResource();
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
@@ -63,6 +73,7 @@ public class Redis {
 	}
 
 	public void delete(String key, String type) {
+		var jedis = jedisPool.getResource();
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
@@ -76,7 +87,12 @@ public class Redis {
 	}
 
 	public void deleteAll() {
+		var jedis = jedisPool.getResource();
 		jedis.del("search:*");
 		jedis.del("source:*");
+	}
+
+	public boolean isConnected() {
+		return jedisPool.getResource().isConnected();
 	}
 }

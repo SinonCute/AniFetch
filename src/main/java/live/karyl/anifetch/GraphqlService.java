@@ -1,6 +1,5 @@
 package live.karyl.anifetch;
 
-import live.karyl.anifetch.models.AnimeParser;
 import live.karyl.anifetch.models.AnimeSource;
 import live.karyl.anifetch.models.Results;
 import live.karyl.anifetch.utils.Utils;
