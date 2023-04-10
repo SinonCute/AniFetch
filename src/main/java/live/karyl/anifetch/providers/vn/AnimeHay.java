@@ -27,7 +27,7 @@ public class AnimeHay extends AnimeProvider {
 	private static final String PLAYER_API = "https://suckplayer.xyz/player/index.php?data=%s&do=getVideo";
 
 	public AnimeHay() {
-		super("AnimeHay", "https://animehay.live/");
+		super("AnimeHay", "AH","https://animehay.live/");
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class AnimeHay extends AnimeProvider {
 		if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
 			var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
 			var episodes = extractEpisodeIds("https://animehay.live/thong-tin-phim/a-" + id + ".html");
-			animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
+			animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
 			animeParser.setEpisodes(episodes);
 			redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
 			return animeParser;
@@ -62,7 +62,7 @@ public class AnimeHay extends AnimeProvider {
 				if (compareResult(anilistInfo, mainPage, entry.getKey())) {
 					var id = searchResult.replaceAll("^.*-(\\d+)\\.html$", "$1");
 					var episodes = extractEpisodeIds(searchResult);
-					animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
+					animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
 					animeParser.setEpisodes(episodes);
 					redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
 					postgreSQL.addAnimeFetch(animeParser);

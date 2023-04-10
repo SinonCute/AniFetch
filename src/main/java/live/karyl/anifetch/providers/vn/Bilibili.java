@@ -28,7 +28,7 @@ public class Bilibili extends AnimeProvider {
 	private static final String API_URL = "https://api.bilibili.tv/intl/gateway/web/";
 
 	public Bilibili() {
-		super("Bilibili", "https://www.bilibili.tv/");
+		super("Bilibili", "BL", "https://www.bilibili.tv/");
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class Bilibili extends AnimeProvider {
 		if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
 			var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
 			var episodes = extractEpisodeIds(connect(WATCH_URL + id, siteName));
-			animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
+			animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
 			animeParser.setEpisodes(episodes);
 			redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
 			return animeParser;
@@ -62,7 +62,7 @@ public class Bilibili extends AnimeProvider {
 				var mainPage = connect(WATCH_URL + searchResult, siteName);
 				if (compareResult(anilistInfo, mainPage, entry.getKey())) {
 					var episodes = extractEpisodeIds(mainPage);
-					animeParser = new AnimeParser(anilistInfo.getId(), searchResult, siteName);
+					animeParser = new AnimeParser(anilistInfo.getId(), searchResult, siteId, siteName);
 					animeParser.setEpisodes(episodes);
 					redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
 					postgreSQL.addAnimeFetch(animeParser);

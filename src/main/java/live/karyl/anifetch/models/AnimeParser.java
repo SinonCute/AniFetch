@@ -6,13 +6,15 @@ import java.util.*;
 
 public class AnimeParser {
 	private final String animeId;
+	private final String mediaId;
 	private final String providerId;
 	private final String providerName;
 
 	private List<AnimeEpisode> episodes;
 
-	public AnimeParser(String animeId, String providerId, String providerName) {
+	public AnimeParser(String animeId, String mediaId, String providerId, String providerName) {
 		this.animeId = animeId;
+		this.mediaId = mediaId;
 		this.providerId = providerId;
 		this.providerName = providerName;
 		episodes = new ArrayList<>();
@@ -21,6 +23,8 @@ public class AnimeParser {
 	public String getAnimeId() {
 		return animeId;
 	}
+
+	public String getMediaId() { return mediaId; }
 
 	public String getProviderId() {
 		return providerId;

@@ -24,7 +24,7 @@ import java.util.Map;
 public class AnimeVietsub extends AnimeProvider {
 
 	public AnimeVietsub() {
-		super("AnimeVietsub", "https://animevietsub.in/");
+		super("AnimeVietsub", "AVS","https://animevietsub.in/");
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class AnimeVietsub extends AnimeProvider {
 		if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
 			var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
 			var episodes = extractEpisodeIds("https://animevietsub.in/phim/a-a" + id + "/");
-			animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
+			animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
 			animeParser.setEpisodes(episodes);
 			redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
 			return animeParser;
@@ -59,7 +59,7 @@ public class AnimeVietsub extends AnimeProvider {
 				if (compareResult(anilistInfo, mainPage, entry.getKey())) {
 					var id = searchResult.replaceAll(".+a(\\d+)/", "$1");
 					var episodes = extractEpisodeIds(searchResult);
-					animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
+					animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
 					animeParser.setEpisodes(episodes);
 					redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
 					postgreSQL.addAnimeFetch(animeParser);

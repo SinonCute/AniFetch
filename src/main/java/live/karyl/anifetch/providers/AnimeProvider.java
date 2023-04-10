@@ -20,6 +20,7 @@ import java.util.Locale;
 
 public abstract class AnimeProvider {
 	protected final String siteName;
+	protected final String siteId;
 	protected final String baseUrl;
 
 	protected final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
@@ -34,8 +35,9 @@ public abstract class AnimeProvider {
 	protected final PostgreSQL postgreSQL = AniFetchApplication.getPostgreSQL();
 	protected final ConfigManager config = AniFetchApplication.getConfig();
 
-	protected AnimeProvider(String siteName, String baseUrl) {
+	protected AnimeProvider(String siteName, String siteId, String baseUrl) {
 		this.siteName = siteName;
+		this.siteId = siteId;
 		this.baseUrl = baseUrl;
 	}
 
@@ -85,4 +87,8 @@ public abstract class AnimeProvider {
 			return Integer.parseInt(s);
         }
     }
+
+	public String getSiteName() { return siteName; }
+
+	public String getSiteId() { return siteId; }
 }

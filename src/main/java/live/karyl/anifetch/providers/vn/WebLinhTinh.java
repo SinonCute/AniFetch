@@ -11,7 +11,6 @@ import live.karyl.anifetch.utils.Utils;
 import okhttp3.FormBody;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -25,7 +24,7 @@ import java.util.regex.Pattern;
 public class WebLinhTinh extends AnimeProvider {
 
     public WebLinhTinh() {
-        super("webLinhTinh", "https://weblinhtinh.net/");
+        super("webLinhTinh", "WLT","https://weblinhtinh.net/");
     }
 
     @Override
@@ -44,7 +43,7 @@ public class WebLinhTinh extends AnimeProvider {
         if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
             var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
             var episodes = extractEpisodeIds(id);
-            animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
+            animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
             animeParser.setEpisodes(episodes);
             redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
             return animeParser;
@@ -60,7 +59,7 @@ public class WebLinhTinh extends AnimeProvider {
                 System.out.println(searchResult);
                 if (compareResult(mainPage, anilistInfo, key)) {
                     var id = mainPage.select("#bookmark").attr("data-id");
-                    animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
+                    animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
                     animeParser.setEpisodes(extractEpisodeIds(id));
                     postgreSQL.addAnimeFetch(animeParser);
                     break;

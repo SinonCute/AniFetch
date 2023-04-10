@@ -26,26 +26,13 @@ public class GraphqlService {
 	@QueryMapping("source")
 	public AnimeSource source(@Argument String providerId, @Argument String value) {
 		System.out.println("Getting source for " + providerId + " " + value);
-		switch (providerId) {
-			case "ATVN" -> {
-				return AniFetchApplication.getProviders().get("AnimeTVN").getLink(value);
-			}
-			case "WLT" -> {
-				return AniFetchApplication.getProviders().get("WebLinhTinh").getLink(value);
-			}
-			case "AH" -> {
-				return AniFetchApplication.getProviders().get("AnimeHay").getLink(value);
-			}
-			case "AV" -> {
-				return AniFetchApplication.getProviders().get("AnimeVietsub").getLink(value);
-			}
-			case "BL" -> {
-				return AniFetchApplication.getProviders().get("Bilibili").getLink(value);
-			}
-			default -> {
-				return null;
+		var providers = AniFetchApplication.getProviders().values();
+		for (var provider : providers) {
+			if (provider.getSiteId().equals(providerId)) {
+				return provider.getLink(value);
 			}
 		}
+		return null;
 	}
 }
 

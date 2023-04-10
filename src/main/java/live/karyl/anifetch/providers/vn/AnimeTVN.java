@@ -32,7 +32,7 @@ public class AnimeTVN extends AnimeProvider {
 
 
 	public AnimeTVN() {
-		super("AnimeTVN", "https://animetvn.xyz/");
+		super("AnimeTVN", "ATVN","https://animetvn.xyz/");
 		token = new String[2];
 		requestToken();
 	}
@@ -53,7 +53,7 @@ public class AnimeTVN extends AnimeProvider {
 		if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
 			var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
 			var episodes = extractEpisodeIds("https://animetvn.xyz/thong-tin-phim/f" + id + "-a.html");
-			animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
+			animeParser = new AnimeParser(anilistInfo.getId(), id,  siteId, siteName);
 			animeParser.setEpisodes(episodes);
 			redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
 			return animeParser;
@@ -69,7 +69,7 @@ public class AnimeTVN extends AnimeProvider {
 				if (compareResult(anilistInfo, searchResult, entry.getKey())) {
 					String id = searchResult.replaceAll("^.*f(\\d+).*$", "$1");
 					var episodes = extractEpisodeIds(searchResult);
-					animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
+					animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
 					animeParser.setEpisodes(episodes);
 					postgreSQL.addAnimeFetch(animeParser);
 					break;
