@@ -1,11 +1,11 @@
 package live.karyl.anifetch.providers.vn;
 
 import com.google.gson.Gson;
-import live.karyl.anifetch.models.AnilistInfo;
-import live.karyl.anifetch.models.AnimeEpisode;
-import live.karyl.anifetch.models.AnimeParser;
-import live.karyl.anifetch.models.AnimeSource;
+import live.karyl.anifetch.models.*;
 import live.karyl.anifetch.providers.AnimeProvider;
+import live.karyl.anifetch.types.AudioType;
+import live.karyl.anifetch.types.SubtitleType;
+import live.karyl.anifetch.types.VideoType;
 import live.karyl.anifetch.utils.SearchRequest;
 import live.karyl.anifetch.utils.Utils;
 import okhttp3.FormBody;
@@ -84,7 +84,7 @@ public class AnimeTVN extends AnimeProvider {
 	@Override
 	public AnimeSource getLink(String value) {
 		try {
-			AnimeSource sources = new AnimeSource(siteName);
+			AnimeSource animeSource = new AnimeSource(siteName);
 			String redisId = siteName + "$" + value;
 
 			if (redis.exists(redisId, REDIS_SOURCE)) {
@@ -111,20 +111,29 @@ public class AnimeTVN extends AnimeProvider {
 						URI uri = new URI(data);
 						String path = uri.getPath();
 						String fileID = path.substring(path.lastIndexOf("/") + 1);
-						var a = playHQB(fileID);
-						if (a != null) sources.addSource(a, id, "hls");
+						var url = playHQB(fileID);
+						if (url != null) {
+							var videoResource = new VideoResource(url, "720P", id, VideoType.HLS);
+							animeSource.addVideoResource(videoResource);
+						}
 					}
 					case "13" -> {
-						var document = connect(data, siteName, "");
+						var document = connect(data, siteName);
 						String patternString = "https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
 						Pattern pattern = Pattern.compile(patternString);
 						Matcher matcher = pattern.matcher(document.html());
-						if (matcher.find()) sources.addSource(matcher.group(), id, "hls");
+						if (matcher.find()) {
+							var videoResource = new VideoResource(matcher.group(), "720P", id, VideoType.MP4);
+							animeSource.addVideoResource(videoResource);
+						}
 					}
 				}
 			}
-			redis.set(redisId, sources.toJson(), REDIS_SOURCE);
-			return sources;
+			animeSource.setAudioType(AudioType.HARD);
+			animeSource.setSubtitleType(SubtitleType.HARD);
+
+			redis.set(redisId, animeSource.toJson(), REDIS_SOURCE);
+			return animeSource;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -132,10 +141,10 @@ public class AnimeTVN extends AnimeProvider {
 	}
 
 	private List<AnimeEpisode> extractEpisodeIds(String link) {
-		var mainPage = connect(link, siteName, "");
+		var mainPage = connect(link, siteName);
 		if (mainPage.select(".play-now").isEmpty()) return null;
 		var watchUrl = mainPage.select(".play-now").get(0).attr("href");
-		var watchPage = connect(watchUrl, siteName, "");
+		var watchPage = connect(watchUrl, siteName);
 
 		List<AnimeEpisode> episodes = new ArrayList<>();
 
@@ -144,7 +153,7 @@ public class AnimeTVN extends AnimeProvider {
 			for (var ep : server.select("a.tapphim")) {
 				var id = ep.attr("id").split("_")[1];
 				var episodeNumber = extractNumberFromString(ep.text());
-				episodes.add(new AnimeEpisode(episodeNumber, id));
+				episodes.add(new AnimeEpisode(ep.text(), episodeNumber, id));
 			}
 		}
 
@@ -154,7 +163,7 @@ public class AnimeTVN extends AnimeProvider {
 	}
 
 	private boolean compareResult(AnilistInfo anilistInfo, String link, String type) {
-		Document document = connect(link, siteName, "");
+		Document document = connect(link, siteName);
 		String title = document.select(".name-vi").first().text();
 		int year = 0;
 		int episode = 0;

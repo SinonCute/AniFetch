@@ -23,6 +23,13 @@ public class ConfigManager {
 
 	private boolean isDebug;
 
+	/*
+	 *
+	 */
+
+	private String bilibiliCookie;
+
+
 	public static ConfigManager getInstance() {
 		return instance;
 	}
@@ -57,6 +64,8 @@ public class ConfigManager {
 
 		isDebug = yaml.getBoolean("general.debug");
 
+		bilibiliCookie = yaml.getString("bilibili.cookie");
+
 		instance = this;
 	}
 
@@ -86,6 +95,10 @@ public class ConfigManager {
 
 	public boolean isDebug() {
 		return isDebug;
+	}
+
+	public String getBilibiliCookie() {
+		return bilibiliCookie;
 	}
 
 }

@@ -1,33 +1,82 @@
 package live.karyl.anifetch.models;
 
 import com.google.gson.Gson;
+import live.karyl.anifetch.types.AudioType;
+import live.karyl.anifetch.types.SubtitleType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@SuppressWarnings("unused")
 public class AnimeSource {
 
 	private final String providerId;
-	private final List<Source> sources;
+	private final List<VideoResource> videoResources;
+	private final List<AudioResource> audioResources;
+	private final List<Subtitle> subtitles;
+
+	private SubtitleType subtitleType;
+	private AudioType audioType;
+
+	private final Map<String, String[]> headers;
 
 	public AnimeSource(String providerId) {
 		this.providerId = providerId;
-		sources = new ArrayList<>();
+		videoResources = new ArrayList<>();
+		audioResources = new ArrayList<>();
+		subtitles = new ArrayList<>();
+		headers = new HashMap<>();
 	}
 
 	public String getProviderId() {
 		return providerId;
 	}
 
-	public void addSource(String link, String serverId, String type) {
-		sources.add(new Source(link, serverId, type));
+	public void setVideoResources(List<VideoResource> videoResources) {
+		this.videoResources.clear();
+		this.videoResources.addAll(videoResources);
 	}
 
-	public void addSource(Source source) {
-		sources.add(source);
+	public void setAudioResources(List<AudioResource> audioResources) {
+		this.audioResources.clear();
+		this.audioResources.addAll(audioResources);
 	}
 
-	public List<Source> getSources() { return sources; }
+	public void setSubtitles(List<Subtitle> subtitles) {
+		this.subtitles.clear();
+		this.subtitles.addAll(subtitles);
+	}
+
+	public void setSubtitleType(SubtitleType subtitleType) {
+		this.subtitleType = subtitleType;
+	}
+
+	public void setAudioType(AudioType audioType) {
+		this.audioType = audioType;
+	}
+
+	public void setHeaders(Map<String, String[]> headers) {
+		this.headers.clear();
+		this.headers.putAll(headers);
+	}
+
+	public void addHeader(String key, String[] value) {
+		headers.put(key, value);
+	}
+
+	public void addVideoResource(VideoResource videoResource) {
+		videoResources.add(videoResource);
+	}
+
+	public void addAudioResource(AudioResource audioResource) {
+		audioResources.add(audioResource);
+	}
+
+	public void addSubtitle(Subtitle subtitle) {
+		subtitles.add(subtitle);
+	}
 
 	public String toJson() {
 		Gson gson = new Gson();
@@ -37,37 +86,5 @@ public class AnimeSource {
 	public AnimeSource fromJson(String json) {
 		Gson gson = new Gson();
 		return gson.fromJson(json, AnimeSource.class);
-	}
-
-	public static class Source {
-		private final String link;
-		private final String type;
-		private final String serverId;
-		private final List<String> headers;
-
-		public Source(String link, String serverId, String type) {
-			this.link = link;
-			this.type = type;
-			this.serverId = serverId;
-			headers = new ArrayList<>();
-		}
-
-		public String getLink() {
-			return link;
-		}
-
-		public String getType() {
-			return type;
-		}
-
-		public String getServerId() {
-			return serverId;
-		}
-
-		public void addHeader(String header) {
-			headers.add(header);
-		}
-
-		public List<String> getHeaders() { return headers; }
 	}
 }

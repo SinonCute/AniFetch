@@ -1,34 +1,54 @@
 type Query {
-  anime(id: ID): Result
-  source(providerId: String, value: String): AnimeSource
+    anime(id: ID): Result
+    source(providerId: String, value: String): AnimeSource
 }
 
 type Result {
-  totalResults: Int # Number of results
-  success: Boolean # Success
-  anime: [Anime]
+    totalResults: Int # Number of results
+    success: Boolean # Success
+    anime: [Anime]
 }
 
 type Anime {
-  animeId: ID # Anime ID
-  providerId: ID # Provider ID
-  providerName: String # Provider name
-  episodes: [Episode]
+    animeId: ID # Anime ID
+    providerId: ID # Provider ID
+    providerName: String # Provider name
+    episodes: [Episode]
 }
 
 type Episode {
-  episodeNumber: Int # Episode number
-  value: String # Episode name
+    episodeNumber: Int # Episode number
+    value: String # Episode name
 }
 
 type AnimeSource {
-  providerId: ID # Provider ID
-  sources: [Source]
+    providerId: ID # Provider ID
+    subtitleType: String # Subtitle type
+    audioType: String # Audio type
+    headers: [String] # Headers
+    videoResources: [VideoResource]
+    audioResources: [AudioResource]
+    subtitles: [Subtitle]
 }
 
-type Source {
-  link: String # Link to the video
-  type: String # Type of the video
-  serverId: ID # Server ID
-  headers: [String] # Headers
+type VideoResource {
+    url: String # Link to the video
+    backupUrl: String # Backup link to the video
+    quality: String # Quality of the video
+    serverId: ID # Server ID
+    audioQuality: String # Audio quality
+    videoType: String # Video type
+    useHeader: Boolean # Use headers
+}
+
+type AudioResource {
+    url: String # Link to the audio
+    backupUrl: String # Backup link to the audio
+    quality: String # Quality of the audio
+}
+
+type Subtitle {
+    language: String # Language of the subtitle
+    ass: String
+    srt: String
 }

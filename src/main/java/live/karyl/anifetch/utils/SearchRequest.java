@@ -1,5 +1,7 @@
 package live.karyl.anifetch.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import live.karyl.anifetch.AniFetchApplication;
 import okhttp3.*;
 import org.jsoup.Jsoup;
@@ -12,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 
 public class SearchRequest {
 
-	private static final String PROXY_VN = "https://proxy-vn.karyl.live/v1/server/proxy?link=";
+	private static final String PROXY_VN = "http://100.71.226.17:8080/v1/server/proxy";
 	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
 
 	public static String[] animeTVN(String key, String year, String[] token) {
@@ -92,16 +94,21 @@ public class SearchRequest {
 		}
 	}
 
-	public static String[] animeHay(String key, String cookie) {
+	public static String[] animeHay(String key) {
 		try {
 			if (key == null) return new String[0];
 			String keyEncoded = URLEncoder.encode(key.replaceAll(" ", "-"), StandardCharsets.UTF_8);
-			String searchURL = PROXY_VN + "https://animehay.live/tim-kiem/" + keyEncoded + ".html";
-			Request request = new Request.Builder()
-					.url(searchURL)
-					.addHeader("User-Agent", USER_AGENT)
-					.addHeader("Cookie", cookie)
+			String searchURL = "https://animehay.live/tim-kiem/" + keyEncoded + ".html";
+			RequestBody requestBody = new FormBody.Builder()
+					.addEncoded("url", searchURL)
+					.addEncoded("method", "GET")
+					.addEncoded("header-user-agent", USER_AGENT)
 					.build();
+			Request request = new Request.Builder()
+					.url(PROXY_VN)
+					.post(requestBody)
+					.build();
+
 			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
 			if (response.code() != 200) {
 				System.out.println("Request failed");
@@ -117,22 +124,23 @@ public class SearchRequest {
 		}
 	}
 
-	public static String[] animeVietsub(String key, String Cookie) {
+	public static String[] animeVietsub(String key) {
 		try {
-			String searchURL = PROXY_VN + "https://animevietsub.in/ajax/suggest";
+			String searchURL = "https://animevietsub.in/ajax/suggest";
 
 			if (key == null) return new String[0];
 
 			RequestBody requestBody = new FormBody.Builder()
-					.addEncoded("ajaxSearch", "1")
-					.addEncoded("keysearch", key)
+					.addEncoded("url", searchURL)
+					.addEncoded("method", "POST")
+					.addEncoded("body-ajaxSearch", "1")
+					.addEncoded("body-keysearch", key)
+					.addEncoded("header-x-requested-with", "XMLHttpRequest")
+					.addEncoded("header-user-agent", USER_AGENT)
 					.build();
 			Request request = new Request.Builder()
-					.url(searchURL)
+					.url(PROXY_VN)
 					.post(requestBody)
-					.addHeader("x-requested-with", "XMLHttpRequest")
-					.addHeader("user-agent", USER_AGENT)
-					.addHeader("Cookie", Cookie)
 					.build();
 
 			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
@@ -146,6 +154,38 @@ public class SearchRequest {
 			System.out.println(elements.size() + " results on animeVietsub" );
 			return elements.stream().map(element -> element.attr("href")).toArray(String[]::new);
 		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static String[] bilibili(String key) {
+		try {
+			String searchURL = "https://api.bilibili.tv/intl/gateway/web/v2/search_v2/anime?s_locale=en_US&platform=web&keyword=%s&highlight=1&pn=1&ps=20".formatted(key);
+			RequestBody requestBody = new FormBody.Builder()
+					.addEncoded("url", searchURL)
+					.addEncoded("method", "GET")
+					.addEncoded("header-user-agent", USER_AGENT)
+					.build();
+			Request request = new Request.Builder()
+					.url(PROXY_VN)
+					.post(requestBody)
+					.build();
+			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
+			if (response.code() != 200) {
+				System.out.println("Request failed");
+				return null;
+			}
+			var jsonObject = new Gson().fromJson(response.body().string(), JsonObject.class);
+			if (jsonObject.getAsJsonObject("data").get("items").isJsonNull()) return new String[0];
+			var itemsArray = jsonObject.getAsJsonObject("data").getAsJsonArray("items");
+			String[] result = new String[itemsArray.size()];
+			for (int i = 0; i < itemsArray.size(); i++) {
+				result[i] = itemsArray.get(i).getAsJsonObject().get("season_id").getAsString();
+			}
+			System.out.println(result.length + " results on bilibili");
+			return result;
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}

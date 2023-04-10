@@ -1,11 +1,11 @@
 package live.karyl.anifetch.providers.vn;
 
 import com.google.gson.Gson;
-import live.karyl.anifetch.models.AnilistInfo;
-import live.karyl.anifetch.models.AnimeEpisode;
-import live.karyl.anifetch.models.AnimeParser;
-import live.karyl.anifetch.models.AnimeSource;
+import live.karyl.anifetch.models.*;
 import live.karyl.anifetch.providers.AnimeProvider;
+import live.karyl.anifetch.types.AudioType;
+import live.karyl.anifetch.types.SubtitleType;
+import live.karyl.anifetch.types.VideoType;
 import live.karyl.anifetch.utils.SearchRequest;
 import live.karyl.anifetch.utils.Utils;
 import okhttp3.FormBody;
@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 public class AnimeHay extends AnimeProvider {
 
 	private static final String PLAYER_API = "https://suckplayer.xyz/player/index.php?data=%s&do=getVideo";
-	private static final String COOKIE = "cf_clearance=qAUxm5MmaZHZWlgeXtKpgt4A2fcmz8VrMq9dMJBWhII-1678686086-0-160";
 
 	public AnimeHay() {
 		super("AnimeHay", "https://animehay.live/");
@@ -46,7 +45,7 @@ public class AnimeHay extends AnimeProvider {
 
 		if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
 			var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
-			var episodes = extractEpisodeIds(PROXY_VN + "https://animehay.live/thong-tin-phim/a-" + id + ".html");
+			var episodes = extractEpisodeIds("https://animehay.live/thong-tin-phim/a-" + id + ".html");
 			animeParser = new AnimeParser(anilistInfo.getId(), id, siteName);
 			animeParser.setEpisodes(episodes);
 			redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
@@ -56,10 +55,10 @@ public class AnimeHay extends AnimeProvider {
 		for (var entry : titles.entrySet()) {
 			var title = entry.getValue();
 			if (animeParser != null) continue;
-			var searchResults = SearchRequest.animeHay(title, COOKIE);
+			var searchResults = SearchRequest.animeHay(title);
 			if (searchResults == null) continue;
 			for (var searchResult : searchResults) {
-				var mainPage = connect(searchResult, siteName, COOKIE);
+				var mainPage = connect(searchResult, siteName);
 				if (compareResult(anilistInfo, mainPage, entry.getKey())) {
 					var id = searchResult.replaceAll("^.*-(\\d+)\\.html$", "$1");
 					var episodes = extractEpisodeIds(searchResult);
@@ -84,7 +83,7 @@ public class AnimeHay extends AnimeProvider {
 			return new Gson().fromJson(jsonData, AnimeSource.class);
 		}
 
-		var mainPage = connect("https://animehay.live/xem-phim/a-" + value + ".html", siteName, COOKIE);
+		var mainPage = connect("https://animehay.live/xem-phim/a-" + value + ".html", siteName);
 		Pattern p = Pattern.compile("(?i)(?<=['\"(])(https?://\\S+)(?=['\")])");
 		Matcher m = p.matcher(mainPage.html());
 		while (m.find()) {
@@ -92,14 +91,21 @@ public class AnimeHay extends AnimeProvider {
 			if (link.contains("suckplayer")) {
 				var data = firePlayer(link);
 				if (data.length == 0) continue;
-				var source = new AnimeSource.Source(data[0], "suckplayer", "hls");
-				source.addHeader(data[1]);
-				animeSource.addSource(source);
+				var videoResource = new VideoResource(data[0], "720P", "suckplayer", VideoType.MP4);
+				videoResource.setUseHeader(true);
+				animeSource.addHeader("Cookie", new String[]{data[1]});
+				animeSource.addVideoResource(videoResource);
 			}
+
 			if (link.contains("cdninstagram.com")) {
-				animeSource.addSource(link, "facebook", "mp4");
+				var videoResource = new VideoResource(link, "720P", "instagram", VideoType.MP4);
+				videoResource.setUseHeader(false);
+				animeSource.addVideoResource(videoResource);
 			}
 		}
+		animeSource.setAudioType(AudioType.HARD);
+		animeSource.setSubtitleType(SubtitleType.HARD);
+
 		redis.set(redisId, animeSource.toJson(), REDIS_SOURCE);
 		return animeSource;
 	}
@@ -131,7 +137,7 @@ public class AnimeHay extends AnimeProvider {
 	}
 
 	private List<AnimeEpisode> extractEpisodeIds(String link) {
-		Document mainPage = connect(link, siteName, COOKIE);
+		Document mainPage = connect(link, siteName);
 		List<AnimeEpisode> episodes = new ArrayList<>();
 		if (mainPage == null) return new ArrayList<>();
 		var episodeElement = mainPage.select("div.ah_content > div.info-movie > " +
@@ -142,7 +148,7 @@ public class AnimeHay extends AnimeProvider {
 			var element = episodeElement.get(i);
 			var id = element.attr("href").replaceAll("^.*-(\\d+)\\.html$", "$1");
 			var number = extractNumberFromString(element.text());
-			episodes.add(new AnimeEpisode(number, id));
+			episodes.add(new AnimeEpisode(element.text(), number, id));
 		}
 		return episodes;
 	}

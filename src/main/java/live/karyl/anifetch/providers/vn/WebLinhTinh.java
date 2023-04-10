@@ -1,11 +1,11 @@
 package live.karyl.anifetch.providers.vn;
 
 import com.google.gson.Gson;
-import live.karyl.anifetch.models.AnilistInfo;
-import live.karyl.anifetch.models.AnimeEpisode;
-import live.karyl.anifetch.models.AnimeParser;
-import live.karyl.anifetch.models.AnimeSource;
+import live.karyl.anifetch.models.*;
 import live.karyl.anifetch.providers.AnimeProvider;
+import live.karyl.anifetch.types.AudioType;
+import live.karyl.anifetch.types.SubtitleType;
+import live.karyl.anifetch.types.VideoType;
 import live.karyl.anifetch.utils.SearchRequest;
 import live.karyl.anifetch.utils.Utils;
 import okhttp3.FormBody;
@@ -56,7 +56,7 @@ public class WebLinhTinh extends AnimeProvider {
             var searchResults = SearchRequest.webLinhTinh(title);
             if (searchResults == null) continue;
             for (var searchResult : searchResults) {
-                var mainPage = connect(searchResult, siteName, "");
+                var mainPage = connect(searchResult, siteName);
                 System.out.println(searchResult);
                 if (compareResult(mainPage, anilistInfo, key)) {
                     var id = mainPage.select("#bookmark").attr("data-id");
@@ -81,7 +81,7 @@ public class WebLinhTinh extends AnimeProvider {
             String episode = a.attr("data-episode");
             String server = a.attr("data-server");
             String postid = a.attr("data-post-id");
-            episodes.add(new AnimeEpisode(Integer.parseInt(episode), episode + "$" + server + "$" + postid));
+            episodes.add(new AnimeEpisode(episode, Integer.parseInt(episode), episode + "$" + server + "$" + postid));
         }
         return episodes;
     }
@@ -112,9 +112,13 @@ public class WebLinhTinh extends AnimeProvider {
             for (var a : sourcesArray) {
                 var sourceObject = a.getAsJsonObject();
                 String link = sourceObject.get("file").getAsString();
-                animeSource.addSource(link, value[1], "hls");
+                var videoResource = new VideoResource(link, "720P", value[1], VideoType.HLS);
+                animeSource.addVideoResource(videoResource);
             }
         }
+        animeSource.setSubtitleType(SubtitleType.HARD);
+        animeSource.setAudioType(AudioType.HARD);
+
         redis.set(redisId, animeSource.toJson(), REDIS_SOURCE);
         return animeSource;
     }

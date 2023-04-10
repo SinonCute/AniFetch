@@ -39,6 +39,9 @@ public class GraphqlService {
 			case "AV" -> {
 				return AniFetchApplication.getProviders().get("AnimeVietsub").getLink(value);
 			}
+			case "BL" -> {
+				return AniFetchApplication.getProviders().get("Bilibili").getLink(value);
+			}
 			default -> {
 				return null;
 			}

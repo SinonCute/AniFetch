@@ -5,14 +5,11 @@ import live.karyl.anifetch.connection.OkHttp;
 import live.karyl.anifetch.database.PostgreSQL;
 import live.karyl.anifetch.database.Redis;
 import live.karyl.anifetch.providers.AnimeProvider;
-import live.karyl.anifetch.providers.vn.AnimeHay;
-import live.karyl.anifetch.providers.vn.AnimeTVN;
-import live.karyl.anifetch.providers.vn.AnimeVietsub;
-import live.karyl.anifetch.providers.vn.WebLinhTinh;
+import live.karyl.anifetch.providers.vn.*;
+import live.karyl.anifetch.utils.Utils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import javax.script.ScriptException;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -54,6 +51,7 @@ public class AniFetchApplication {
 		providers.put("WebLinhTinh", new WebLinhTinh());
 		providers.put("AnimeHay", new AnimeHay());
 		providers.put("AnimeVietsub", new AnimeVietsub());
+		providers.put("Bilibili", new Bilibili());
 	}
 
 	public static File getDataFolder() {

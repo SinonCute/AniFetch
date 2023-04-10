@@ -1,3 +1,3 @@
 package live.karyl.anifetch.models;
 
-public record AnimeEpisode(int episodeNumber, String value) {}
+public record AnimeEpisode(String label, int episodeNumber, String value) {}

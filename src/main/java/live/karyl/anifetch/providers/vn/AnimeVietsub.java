@@ -2,11 +2,11 @@ package live.karyl.anifetch.providers.vn;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import live.karyl.anifetch.models.AnilistInfo;
-import live.karyl.anifetch.models.AnimeEpisode;
-import live.karyl.anifetch.models.AnimeParser;
-import live.karyl.anifetch.models.AnimeSource;
+import live.karyl.anifetch.models.*;
 import live.karyl.anifetch.providers.AnimeProvider;
+import live.karyl.anifetch.types.AudioType;
+import live.karyl.anifetch.types.SubtitleType;
+import live.karyl.anifetch.types.VideoType;
 import live.karyl.anifetch.utils.SearchRequest;
 import live.karyl.anifetch.utils.Utils;
 import okhttp3.FormBody;
@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 public class AnimeVietsub extends AnimeProvider {
-
-	private static final String COOKIE = "cf_clearance=c7d75Q0lZlLdjQKoz6NlXx9IPOPrI96lHmPH4Lqz09o-1680381120-0-160; avs__geoip_confirm=1";
 
 	public AnimeVietsub() {
 		super("AnimeVietsub", "https://animevietsub.in/");
@@ -54,10 +52,10 @@ public class AnimeVietsub extends AnimeProvider {
 		for (var entry : titles.entrySet()) {
 			var title = entry.getValue();
 			if (animeParser != null) continue;
-			var searchResults = SearchRequest.animeVietsub(title, COOKIE);
+			var searchResults = SearchRequest.animeVietsub(title);
 			if (searchResults == null) continue;
 			for (var searchResult : searchResults) {
-				var mainPage = connect(searchResult, siteName, COOKIE);
+				var mainPage = connect(searchResult, siteName);
 				if (compareResult(anilistInfo, mainPage, entry.getKey())) {
 					var id = searchResult.replaceAll(".+a(\\d+)/", "$1");
 					var episodes = extractEpisodeIds(searchResult);
@@ -86,14 +84,15 @@ public class AnimeVietsub extends AnimeProvider {
 			}
 
 			RequestBody requestBody = new FormBody.Builder()
-					.add("episodeId", episodeId)
-					.add("backup", "1")
+					.addEncoded("url", "https://animevietsub.in/ajax/player?v=2019a")
+					.addEncoded("method", "POST")
+					.addEncoded("body-episodeId", episodeId)
+					.addEncoded("body-backup", "1")
+					.addEncoded("header-x-requested-with", "XMLHttpRequest")
+					.addEncoded("header-user-agent", USER_AGENT)
 					.build();
 			Request request = new Request.Builder()
-					.url("https://animevietsub.in/ajax/player?v=2019a")
-					.addHeader("Cookie", COOKIE)
-					.addHeader("User-Agent", USER_AGENT)
-					.addHeader("x-requested-with", "XMLHttpRequest")
+					.url(PROXY_VN)
 					.post(requestBody)
 					.build();
 			var response = connection.callWithoutRateLimit(request);
@@ -105,15 +104,16 @@ public class AnimeVietsub extends AnimeProvider {
 				try {
 					var dataLink = element.attr("data-href");
 					RequestBody requestBodyLink = new FormBody.Builder()
-							.add("link", dataLink)
-							.add("id", animeId)
+							.addEncoded("url", "https://animevietsub.in/ajax/player?v=2019a")
+							.addEncoded("method", "POST")
+							.addEncoded("body-link", dataLink)
+							.addEncoded("body-id", animeId)
+							.addEncoded("header-x-requested-with", "XMLHttpRequest")
+							.addEncoded("header-user-agent", USER_AGENT)
 							.build();
 
 					Request requestLink = new Request.Builder()
-							.url("https://animevietsub.in/ajax/player?v=2019a")
-							.addHeader("Cookie", COOKIE)
-							.addHeader("User-Agent", USER_AGENT)
-							.addHeader("x-requested-with", "XMLHttpRequest")
+							.url(PROXY_VN)
 							.post(requestBodyLink)
 							.build();
 					var responseLink = connection.callWithoutRateLimit(requestLink);
@@ -123,13 +123,17 @@ public class AnimeVietsub extends AnimeProvider {
 					if (jsonLink.get("type").getAsString().equals("hls")) {
 						var link = jsonLink.get("file").getAsString();
 						link = link.replace("//", "https://");
-						AnimeSource.Source source = new AnimeSource.Source(link,"DU", "hls");
-						source.addHeader("Referer https://animevietsub.in/");
-						source.addHeader("Origin https://animevietsub.in/");
-						animeSource.addSource(source);
+						var videoResource = new VideoResource(link, "720P", "DU", VideoType.HLS);
+						videoResource.setUseHeader(true);
+						animeSource.addHeader("Referer", new String[]{"https://animevietsub.in/"});
+						animeSource.addHeader("Origin", new String[]{"https://animevietsub.in/"});
+						animeSource.addVideoResource(videoResource);
 					}
 				} catch (IOException ignored) {}
 			});
+			animeSource.setSubtitleType(SubtitleType.HARD);
+			animeSource.setAudioType(AudioType.HARD);
+
 			redis.set(value, animeSource.toJson(), REDIS_SOURCE);
 			return animeSource;
 		} catch (Exception e) {
@@ -139,15 +143,15 @@ public class AnimeVietsub extends AnimeProvider {
 	}
 
 	private List<AnimeEpisode> extractEpisodeIds(String link) {
-		Document mainPage = connect(link + "xem-phim.html", siteName, COOKIE);
+		Document mainPage = connect(link + "xem-phim.html", siteName);
 		var id = link.replaceAll(".+a(\\d+)/", "$1");
 		if (mainPage == null) return null;
 		List<AnimeEpisode> episodes = new ArrayList<>();
 		mainPage.select(".list-episode > .episode > a").forEach(element -> {
 			var episodeId = element.attr("data-id");
-			var episode = element.text();
-			var number = extractNumberFromString(episode);
-			episodes.add(new AnimeEpisode(number, id + "$" + episodeId));
+			var labelEpisode = element.text();
+			var number = extractNumberFromString(labelEpisode);
+			episodes.add(new AnimeEpisode(labelEpisode, number, id + "$" + episodeId));
 		});
 		return episodes;
 	}
@@ -159,6 +163,8 @@ public class AnimeVietsub extends AnimeProvider {
 				mainPage.select(".Single > header > .SubTitle").text();
 		var year = info.select(".AAIco-date_range").text();
 		var episode = info.select(".AAIco-access_time").text().split("/")[0];
+		// những phần mới chưa chiếu thì không có số tập
+		if (episode.matches(".*\\D+.*")) return false;
 
 		if (type.equals("english")) {
 			return Utils.checkNumberEqual(Integer.parseInt(episode), anilistInfo.getCurrentEpisode())
