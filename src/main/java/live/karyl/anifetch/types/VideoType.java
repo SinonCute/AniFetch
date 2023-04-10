@@ -20,9 +20,9 @@ public enum VideoType {
 
 	public String toString() {
 		return switch (this) {
-			case MP4 -> "mp4";
-			case HLS -> "hls";
-			case DASH -> "dash";
+			case MP4 -> "MP4";
+			case HLS -> "HLS";
+			case DASH -> "DASH";
 		};
 	}
 }

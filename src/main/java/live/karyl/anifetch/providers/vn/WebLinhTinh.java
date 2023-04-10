@@ -56,7 +56,6 @@ public class WebLinhTinh extends AnimeProvider {
             if (searchResults == null) continue;
             for (var searchResult : searchResults) {
                 var mainPage = connect(searchResult, siteName);
-                System.out.println(searchResult);
                 if (compareResult(mainPage, anilistInfo, key)) {
                     var id = mainPage.select("#bookmark").attr("data-id");
                     animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);

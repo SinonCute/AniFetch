@@ -129,9 +129,11 @@ public class Bilibili extends AnimeProvider {
 				var videoUrl = videoObject.get("url").getAsString();
 				var videoUrlBackup = videoObject.get("backup_url").getAsJsonArray().get(0).getAsString();
 				var videoQuality = video.getAsJsonObject().getAsJsonObject("stream_info").get("desc_words").getAsString();
+				var audioQuality = video.getAsJsonObject().get("audio_quality").getAsString();
 				var videoType = VideoType.DASH;
 				var videoResource = new VideoResource(videoUrl, videoQuality, "bilibili", videoType);
 				videoResource.setBackupUrl(videoUrlBackup);
+				videoResource.setAudioQuality(audioQuality);
 				videoResource.setUseHeader(true);
 				videoResources.add(videoResource);
 			});
@@ -158,7 +160,6 @@ public class Bilibili extends AnimeProvider {
 					ass = subtitleObject.getAsJsonObject("ass").get("url").getAsString();
 				}
 				if (!subtitleObject.get("srt").isJsonNull()) {
-					System.out.println(subtitleObject.getAsJsonObject("srt").get("url").getAsString());
 					srt = subtitleObject.getAsJsonObject("srt").get("url").getAsString();
 				}
 				var subtitles = new Subtitle(subtitleLanguage, ass, srt);
@@ -172,6 +173,8 @@ public class Bilibili extends AnimeProvider {
 			animeSource.setSubtitleType(SubtitleType.SOFT);
 
 			animeSource.addHeader("referer", new String[]{"https://www.bilibili.tv/en/play/" + mediaId});
+
+			redis.set(redisId, animeSource.toJson(), REDIS_SOURCE);
 
 			return animeSource;
 
