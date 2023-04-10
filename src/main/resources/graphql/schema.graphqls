@@ -1,12 +1,12 @@
 type Query {
-    anime(id: ID): Result
+    animeSearch(id: ID): Result
     source(providerId: String, value: String): AnimeSource
 }
 
 type Result {
     totalResults: Int # Number of results
     success: Boolean # Success
-    anime: [Anime]
+    animes: [Anime]
 }
 
 type Anime {

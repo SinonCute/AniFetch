@@ -8,11 +8,15 @@ import okhttp3.Response;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.springframework.util.StopWatch;
 import org.tinylog.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class Utils {
 
@@ -71,6 +75,29 @@ public class Utils {
             animeParsers.add(animeParser);
         }
         return animeParsers;
+    }
+
+
+    public static CompletableFuture<List<AnimeParser>> searchAllAsync(String id) {
+        AnilistInfo anilistInfo = fetchAnilist(id);
+        List<CompletableFuture<AnimeParser>> futures = new ArrayList<>();
+
+        for (var provider : AniFetchApplication.getProviders().values()) {
+            CompletableFuture<AnimeParser> future = CompletableFuture.supplyAsync(() -> provider.search(anilistInfo))
+                    .thenApply(animeParser -> {
+                        if (animeParser == null || animeParser.getEpisodes() == null) {
+                            return null;
+                        }
+                        return animeParser;
+                    });
+            futures.add(future);
+        }
+
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> futures.stream()
+                        .map(CompletableFuture::join)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList()));
     }
 
     public static boolean checkNumberEqual(int int1, int int2) {

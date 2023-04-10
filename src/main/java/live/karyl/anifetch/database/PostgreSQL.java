@@ -51,7 +51,7 @@ public class PostgreSQL {
 
     public void addAnimeFetch(AnimeParser animeParser) {
         String animeId = animeParser.getAnimeId();
-        String providerId = animeParser.getProviderId();
+        String providerId = animeParser.getMediaId();
         String provider = animeParser.getProviderName();
         PreparedStatement statement = null;
         try {

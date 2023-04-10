@@ -8,19 +8,22 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Controller
 public class GraphqlService {
 
-	@QueryMapping("anime")
-	public Results episode(@Argument String id) {
+	@QueryMapping("animeSearch")
+	public CompletableFuture<Results> animeSearch(@Argument String id) {
 		System.out.println("Searching for " + id);
-		List<AnimeParser> animeParsers = Utils.searchAll(id);
-		if (animeParsers.isEmpty()) {
-			return new Results(0, false, null);
-		}
-		return new Results(animeParsers.size(), true, animeParsers);
+		return Utils.searchAllAsync(id)
+				.thenApplyAsync(animeParsers -> {
+					if (animeParsers.isEmpty()) {
+						return new Results(0, false, null);
+					} else {
+						return new Results(animeParsers.size(), true, animeParsers);
+					}
+				});
 	}
 
 	@QueryMapping("source")
