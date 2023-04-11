@@ -10,7 +10,7 @@
 - [ ] Weblinhtinh
 - [ ] Animetvn
 - [ ] Animevietsub  
-- [ ] Bilibili 
+- [ ] Bilibili (Ty qtpctechhxd#4748 for account)
 
 ### Done ✓
 
