@@ -93,7 +93,7 @@ public class AnimeHay extends AnimeProvider {
 				if (data.length == 0) continue;
 				var videoResource = new VideoResource(data[0], "720P", "suckplayer", VideoType.MP4);
 				videoResource.setUseHeader(true);
-				animeSource.addHeader("Cookie", new String[]{data[1]});
+				animeSource.addHeader("Cookie", data[1]);
 				animeSource.addVideoResource(videoResource);
 			}
 

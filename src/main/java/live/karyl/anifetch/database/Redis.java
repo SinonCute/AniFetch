@@ -88,8 +88,8 @@ public class Redis {
 
 	public void deleteAll() {
 		var jedis = jedisPool.getResource();
-		jedis.del("search:*");
-		jedis.del("source:*");
+		jedis.keys("search:*").forEach(jedis::del);
+		jedis.keys("source:*").forEach(jedis::del);
 	}
 
 	public boolean isConnected() {

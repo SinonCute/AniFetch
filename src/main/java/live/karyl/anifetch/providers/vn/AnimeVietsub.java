@@ -119,14 +119,19 @@ public class AnimeVietsub extends AnimeProvider {
 					var responseLink = connection.callWithoutRateLimit(requestLink);
 					var jsonInfo = new Gson().fromJson(responseLink.body().string(), JsonObject.class);
 					var jsonLink = jsonInfo.get("link").isJsonArray() ? jsonInfo.get("link").getAsJsonArray().get(0).getAsJsonObject() : null;
-					if (jsonLink == null || !jsonLink.has("type")) return;
-					if (jsonLink.get("type").getAsString().equals("hls")) {
-						var link = jsonLink.get("file").getAsString();
-						link = link.replace("//", "https://");
+					if (jsonLink == null) return;
+					var file = jsonLink.get("file").getAsString();
+					if (file.contains("storage.googleapiscdn.com")) {
+						var link = file.replace("//", "https://");
 						var videoResource = new VideoResource(link, "720P", "DU", VideoType.HLS);
 						videoResource.setUseHeader(true);
-						animeSource.addHeader("Referer", new String[]{"https://animevietsub.in/"});
-						animeSource.addHeader("Origin", new String[]{"https://animevietsub.in/"});
+						animeSource.addHeader("Origin", "https://animevietsub.in/");
+						animeSource.addHeader("Referer", "https://animevietsub.in/");
+						animeSource.addVideoResource(videoResource);
+					}
+					if (file.contains("fbcdn.net")) {
+						var videoResource = new VideoResource(file, "360P", "FB", VideoType.MP4);
+						videoResource.setUseHeader(false);
 						animeSource.addVideoResource(videoResource);
 					}
 				} catch (IOException ignored) {}
@@ -134,7 +139,7 @@ public class AnimeVietsub extends AnimeProvider {
 			animeSource.setSubtitleType(SubtitleType.HARD);
 			animeSource.setAudioType(AudioType.HARD);
 
-			redis.set(value, animeSource.toJson(), REDIS_SOURCE);
+			redis.set(redisId, animeSource.toJson(), REDIS_SOURCE);
 			return animeSource;
 		} catch (Exception e) {
 			e.printStackTrace();

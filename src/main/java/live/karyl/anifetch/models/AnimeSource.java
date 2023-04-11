@@ -5,9 +5,7 @@ import live.karyl.anifetch.types.AudioType;
 import live.karyl.anifetch.types.SubtitleType;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @SuppressWarnings("unused")
 public class AnimeSource {
@@ -20,14 +18,14 @@ public class AnimeSource {
 	private SubtitleType subtitleType;
 	private AudioType audioType;
 
-	private final Map<String, String[]> headers;
+	private final List<Header> headers;
 
 	public AnimeSource(String providerId) {
 		this.providerId = providerId;
 		videoResources = new ArrayList<>();
 		audioResources = new ArrayList<>();
 		subtitles = new ArrayList<>();
-		headers = new HashMap<>();
+		headers = new ArrayList<>();
 	}
 
 	public String getProviderId() {
@@ -57,14 +55,36 @@ public class AnimeSource {
 		this.audioType = audioType;
 	}
 
-	public void setHeaders(Map<String, String[]> headers) {
+	public void setHeaders(List<Header> headers) {
 		this.headers.clear();
-		this.headers.putAll(headers);
+		this.headers.addAll(headers);
 	}
 
-	public void addHeader(String key, String[] value) {
-		headers.put(key, value);
+	public void addHeader(Header header) {
+		for (Header h : headers) {
+			if (h.key().equals(header.key())) {
+				h.value().addAll(header.value());
+				return;
+			} else {
+				headers.add(header);
+			}
+		}
 	}
+
+	public void addHeader(String key, String value) {
+		if (headers.isEmpty()) {
+			headers.add(new Header(key, List.of(value)));
+			return;
+		}
+		for (Header h : headers) {
+			if (h.key().equals(key)) {
+				h.value().add(value);
+				return;
+			}
+		}
+		headers.add(new Header(key, List.of(value)));
+	}
+
 
 	public void addVideoResource(VideoResource videoResource) {
 		videoResources.add(videoResource);

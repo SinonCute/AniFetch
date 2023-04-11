@@ -17,6 +17,7 @@ type Anime {
 }
 
 type Episode {
+    episodeLabel: String # Episode label
     episodeNumber: Int # Episode number
     value: String # Episode name
 }
@@ -25,10 +26,15 @@ type AnimeSource {
     providerId: ID # Provider ID
     subtitleType: String # Subtitle type
     audioType: String # Audio type
-    headers: [String] # Headers
+    headers: [Header] # Headers
     videoResources: [VideoResource]
     audioResources: [AudioResource]
     subtitles: [Subtitle]
+}
+
+type Header {
+    key: String # Header key
+    value: [String] # Header value
 }
 
 type VideoResource {
