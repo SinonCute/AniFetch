@@ -24,8 +24,8 @@ public abstract class AnimeProvider {
 	protected final String siteId;
 	protected final String baseUrl;
 
-	protected final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
-	protected final String PROXY_VN = "http://100.71.226.17:8080/v1/server/proxy";
+	protected String USER_AGENT = "";
+	protected String PROXY_VN = "";
 
 	protected final String REDIS_SEARCH = "search";
 	protected final String REDIS_SOURCE = "source";
@@ -40,6 +40,8 @@ public abstract class AnimeProvider {
 		this.siteName = siteName;
 		this.siteId = siteId;
 		this.baseUrl = baseUrl;
+		PROXY_VN = config.getProxyVN();
+		USER_AGENT = config.getUserAgent();
 	}
 
 	public abstract AnimeParser search(AnilistInfo anilistInfo);

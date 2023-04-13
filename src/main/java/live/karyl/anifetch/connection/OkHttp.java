@@ -1,5 +1,7 @@
 package live.karyl.anifetch.connection;
 
+import live.karyl.anifetch.AniFetchApplication;
+import live.karyl.anifetch.config.ConfigManager;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -11,6 +13,8 @@ public class OkHttp {
 
     private OkHttpClient client;
 
+    private final ConfigManager config = AniFetchApplication.getConfig();
+
     public void init() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.readTimeout(15, TimeUnit.SECONDS);
@@ -20,7 +24,7 @@ public class OkHttp {
     }
 
     public Response call(Request request) {
-        var retry = 5;
+        var retry = config.getOkHttpRetry();
         while (retry > 0) {
             try {
                 return client.newCall(request).execute();
@@ -33,7 +37,7 @@ public class OkHttp {
     }
 
     public Response callWithoutRateLimit(Request request) {
-        var retry = 5;
+        var retry = config.getOkHttpRetry();
         while (retry > 0) {
             try {
                 return client.newCall(request).execute();

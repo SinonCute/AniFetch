@@ -1,6 +1,7 @@
 package live.karyl.anifetch.utils;
 
 import live.karyl.anifetch.AniFetchApplication;
+import live.karyl.anifetch.config.ConfigManager;
 import live.karyl.anifetch.models.AnilistInfo;
 import live.karyl.anifetch.models.AnimeParser;
 import okhttp3.Request;
@@ -8,7 +9,6 @@ import okhttp3.Response;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.springframework.util.StopWatch;
 import org.tinylog.Logger;
 
 import java.util.ArrayList;
@@ -19,6 +19,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class Utils {
+
+    private static final ConfigManager config = AniFetchApplication.getConfig();
 
     public static AnilistInfo fetchAnilist(String id) {
         try {
@@ -41,13 +43,13 @@ public class Utils {
     }
 
     public static Document connect(String url, String cookie) {
-        int retry = 5;
+        int retry = config.getOkHttpRetry();
         int timeout = 5000;
         Document document = null;
         while (retry > 0) {
             try {
                 document = Jsoup.connect(url)
-                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36")
+                        .userAgent(config.getUserAgent())
                         .header("Cookie", cookie)
                         .timeout(timeout)
                         .get();

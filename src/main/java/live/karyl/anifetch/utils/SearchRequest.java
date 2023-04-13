@@ -3,6 +3,7 @@ package live.karyl.anifetch.utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import live.karyl.anifetch.AniFetchApplication;
+import live.karyl.anifetch.config.ConfigManager;
 import okhttp3.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,8 +16,7 @@ import java.util.Locale;
 
 public class SearchRequest {
 
-	private static final String PROXY_VN = "http://100.71.226.17:8080/v1/server/proxy";
-	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
+	private static final ConfigManager config = AniFetchApplication.getConfig();
 
 	public static String[] animeTVN(String key, String year, String[] token) {
 		try {
@@ -87,7 +87,7 @@ public class SearchRequest {
 			}
 			Document doc = Jsoup.parse(response.body().string());
 			Elements elements = doc.select(".exact_result > a");
-			System.out.println(elements.size() + " results on webLinhTinh" );
+			System.out.println(elements.size() + " results on webLinhTinh");
 			return elements.stream().map(element -> element.attr("href")).toArray(String[]::new);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -103,10 +103,10 @@ public class SearchRequest {
 			RequestBody requestBody = new FormBody.Builder()
 					.addEncoded("url", searchURL)
 					.addEncoded("method", "GET")
-					.addEncoded("header-user-agent", USER_AGENT)
+					.addEncoded("header-user-agent", config.getUserAgent())
 					.build();
 			Request request = new Request.Builder()
-					.url(PROXY_VN)
+					.url(config.getProxyVN())
 					.post(requestBody)
 					.build();
 
@@ -137,10 +137,10 @@ public class SearchRequest {
 					.addEncoded("body-ajaxSearch", "1")
 					.addEncoded("body-keysearch", key)
 					.addEncoded("header-x-requested-with", "XMLHttpRequest")
-					.addEncoded("header-user-agent", USER_AGENT)
+					.addEncoded("header-user-agent", config.getUserAgent())
 					.build();
 			Request request = new Request.Builder()
-					.url(PROXY_VN)
+					.url(config.getProxyVN())
 					.post(requestBody)
 					.build();
 
@@ -152,7 +152,7 @@ public class SearchRequest {
 
 			Document doc = Jsoup.parse(response.body().string());
 			Elements elements = doc.select(".ss-info > a");
-			System.out.println(elements.size() + " results on animeVietsub" );
+			System.out.println(elements.size() + " results on animeVietsub");
 			return elements.stream().map(element -> element.attr("href")).toArray(String[]::new);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -171,10 +171,10 @@ public class SearchRequest {
 			RequestBody requestBody = new FormBody.Builder()
 					.addEncoded("url", suggestURL)
 					.addEncoded("method", "GET")
-					.addEncoded("header-user-agent", USER_AGENT)
+					.addEncoded("header-user-agent", config.getUserAgent())
 					.build();
 			Request request = new Request.Builder()
-					.url(PROXY_VN)
+					.url(config.getProxyVN())
 					.post(requestBody)
 					.build();
 			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
@@ -186,10 +186,10 @@ public class SearchRequest {
 			requestBody = new FormBody.Builder()
 					.addEncoded("url", searchURL)
 					.addEncoded("method", "GET")
-					.addEncoded("header-user-agent", USER_AGENT)
+					.addEncoded("header-user-agent", config.getUserAgent())
 					.build();
 			request = new Request.Builder()
-					.url(PROXY_VN)
+					.url(config.getProxyVN())
 					.post(requestBody)
 					.build();
 			response = AniFetchApplication.getConnection().callWithoutRateLimit(request);

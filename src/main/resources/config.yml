@@ -1,2 +1,27 @@
+database:
+  host: ""
+  port: 3306
+  name: ""
+  user: ""
+  password: ""
+  timeout: 1000
+
+redis:
+  host: ""
+  port: 6379
+  pool:
+    max: 20
+    min: 5
+    idle: 5
+
+blacklist:
+  - ""
+
+general:
+  debug: false
+  okHttpRetry: 3
+  proxyVN: ""
+  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
+
 bilibili:
-  cookie: "SESSDATA=9299cda5%2C1696570437%2C347de%2A41"
+  cookie: ""

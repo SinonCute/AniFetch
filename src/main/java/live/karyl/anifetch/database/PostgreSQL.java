@@ -2,6 +2,8 @@ package live.karyl.anifetch.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import live.karyl.anifetch.AniFetchApplication;
+import live.karyl.anifetch.config.ConfigManager;
 import live.karyl.anifetch.models.AnimeParser;
 import org.tinylog.Logger;
 
@@ -15,16 +17,19 @@ public class PostgreSQL {
 
     private static final String SELECT_ANIME = "SELECT * FROM anime WHERE anime_id = ? AND provider_name = ?";
 
+    private final ConfigManager config = AniFetchApplication.getConfig();
+
     public void init() {
         try {
-            HikariConfig config = new HikariConfig();
-            config.setJdbcUrl("jdbc:postgresql://db.myvhzegeowsapjobfptt.supabase.co:5432/postgres");
-            config.setUsername("postgres");
-            config.setPassword("Hiencaokgkg@@");
-            config.addDataSourceProperty("cachePrepStmts", "true");
-            config.addDataSourceProperty("prepStmtCacheSize", "250");
-            config.setConnectionTimeout(10000);
-            HikariDataSource ds = new HikariDataSource(config);
+            HikariConfig hikariConfig = new HikariConfig();
+            hikariConfig.setJdbcUrl("jdbc:postgresql://%s:%s/%s"
+                    .formatted(config.getDatabaseHost(), config.getDatabasePort(), config.getDatabaseName()));
+            hikariConfig.setUsername(config.getDatabaseUser());
+            hikariConfig.setPassword(config.getDatabasePassword());
+            hikariConfig.setConnectionTimeout(config.getDatabaseTimeout());
+            hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+            hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+            HikariDataSource ds = new HikariDataSource(hikariConfig);
             sql = ds.getConnection();
             System.out.println("PostgreSQL connection established");
         } catch (Exception e) {

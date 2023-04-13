@@ -18,17 +18,22 @@ public class ConfigManager {
 	private String databaseName;
 	private String databaseUser;
 	private String databasePassword;
+	private int databaseTimeout;
+
+	private String redisHost;
+	private int redisPort;
+	private int redisPoolSizeMax;
+	private int redisPoolSizeMin;
+	private int redisPoolSizeIdle;
 
 	private List<String> blacklist;
 
 	private boolean isDebug;
-
-	/*
-	 *
-	 */
+	private int okHttpRetry;
+	private String proxyVN;
+	private String userAgent;
 
 	private String bilibiliCookie;
-
 
 	public static ConfigManager getInstance() {
 		return instance;
@@ -60,10 +65,20 @@ public class ConfigManager {
 		databaseName = yaml.getString("database.name");
 		databaseUser = yaml.getString("database.user");
 		databasePassword = yaml.getString("database.password");
+		databaseTimeout = yaml.getInt("database.timeout");
+
+		redisHost = yaml.getString("redis.host");
+		redisPort = yaml.getInt("redis.port");
+		redisPoolSizeMax = yaml.getInt("redis.pool.size.max");
+		redisPoolSizeMin = yaml.getInt("redis.pool.size.min");
+		redisPoolSizeIdle = yaml.getInt("redis.pool.size.idle");
 
 		blacklist = yaml.getStringList("blacklist");
 
 		isDebug = yaml.getBoolean("general.debug");
+		okHttpRetry = yaml.getInt("general.okHttpRetry");
+		proxyVN = yaml.getString("general.proxyVN");
+		userAgent = yaml.getString("general.userAgent");
 
 		bilibiliCookie = yaml.getString("bilibili.cookie");
 
@@ -90,12 +105,46 @@ public class ConfigManager {
 		return databasePassword;
 	}
 
+	public int getDatabaseTimeout() { return databaseTimeout; }
+
+	public String getRedisHost() {
+		return redisHost;
+	}
+
+	public int getRedisPort() {
+		return redisPort;
+	}
+
+	public int getRedisPoolSizeMax() {
+		return redisPoolSizeMax;
+	}
+
+	public int getRedisPoolSizeMin() {
+		return redisPoolSizeMin;
+	}
+
+	public int getRedisPoolSizeIdle() {
+		return redisPoolSizeIdle;
+	}
+
 	public List<String> getBlacklist() {
 		return blacklist;
 	}
 
 	public boolean isDebug() {
 		return isDebug;
+	}
+
+	public int getOkHttpRetry() {
+		return okHttpRetry;
+	}
+
+	public String getProxyVN() {
+		return proxyVN;
+	}
+
+	public String getUserAgent() {
+		return userAgent;
 	}
 
 	public String getBilibiliCookie() {
