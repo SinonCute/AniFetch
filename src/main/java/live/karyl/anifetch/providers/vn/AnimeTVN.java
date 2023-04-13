@@ -45,6 +45,10 @@ public class AnimeTVN extends AnimeProvider {
 		titles.put("english", anilistInfo.getTitle().english);
 		titles.put("romaji", anilistInfo.getTitle().romaji);
 
+		if (redis.exists(redisId, REDIS_NON_EXIST)) {
+			return null;
+		}
+
 		if (redis.exists(redisId, REDIS_SEARCH)) {
 			animeParser = new Gson().fromJson(redis.get(redisId, REDIS_SEARCH), AnimeParser.class);
 			if (animeParser != null) return animeParser;
@@ -71,13 +75,15 @@ public class AnimeTVN extends AnimeProvider {
 					var episodes = extractEpisodeIds(searchResult);
 					animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
 					animeParser.setEpisodes(episodes);
+					redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
 					postgreSQL.addAnimeFetch(animeParser);
 					break;
 				}
 			}
 		}
-		if (animeParser == null) return null;
-		redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
+		if (animeParser == null) {
+			redis.set(redisId, "null", REDIS_NON_EXIST);
+		}
 		return animeParser;
 	}
 

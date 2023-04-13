@@ -11,6 +11,10 @@ public class Redis {
 
 	private final ConfigManager config = AniFetchApplication.getConfig();
 
+	protected final String REDIS_SEARCH = "search";
+	protected final String REDIS_SOURCE = "source";
+	protected final String REDIS_NON_EXIST = "non_exist";
+
 	public void init() {
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
 		var host = config.getRedisHost();
@@ -35,13 +39,14 @@ public class Redis {
 		System.out.println("SET | " + key + " - " + type + "");
 		try (var jedis = jedisPool.getResource()) {
 			switch (type) {
-				case "search" -> {
-					var prefix = "search:";
-					jedis.setex(prefix + key, 43200, value); // 12 hours
+				case REDIS_SEARCH -> {
+					jedis.setex(REDIS_SEARCH + ":" + key, 43200, value); // 12 hours
 				}
-				case "source" -> {
-					var prefix = "source:";
-					jedis.setex(prefix + key, 3600, value); // 1 hour
+				case REDIS_SOURCE -> {
+					jedis.setex(REDIS_SOURCE + ":" + key, 3600, value); // 1 hour
+				}
+				case REDIS_NON_EXIST -> {
+					jedis.setex(REDIS_NON_EXIST + ":" + key, 604800, value); // 1 week
 				}
 			}
 		}
@@ -51,13 +56,11 @@ public class Redis {
 		System.out.println("GET | " + key + " - " + type + "");
 		try (var jedis = jedisPool.getResource()) {
 			switch (type) {
-				case "search" -> {
-					var prefix = "search:";
-					return jedis.get(prefix + key);
+				case REDIS_SEARCH -> {
+					return jedis.get(REDIS_SEARCH + ":" + key);
 				}
-				case "source" -> {
-					var prefix = "source:";
-					return jedis.get(prefix + key);
+				case REDIS_SOURCE -> {
+					return jedis.get(REDIS_SOURCE + ":" + key);
 				}
 			}
 		}
@@ -68,13 +71,14 @@ public class Redis {
 		System.out.println("EXISTS | " + key + " - " + type + "");
 		try (var jedis = jedisPool.getResource()) {
 			switch (type) {
-				case "search" -> {
-					var prefix = "search:";
-					return jedis.exists(prefix + key);
+				case REDIS_SEARCH -> {
+					return jedis.exists(REDIS_SEARCH + ":" + key);
 				}
-				case "source" -> {
-					var prefix = "source:";
-					return jedis.exists(prefix + key);
+				case REDIS_SOURCE -> {
+					return jedis.exists(REDIS_SOURCE + ":" + key);
+				}
+				case REDIS_NON_EXIST -> {
+					return jedis.exists(REDIS_NON_EXIST + ":" + key);
 				}
 			}
 		}
@@ -84,13 +88,14 @@ public class Redis {
 	public void delete(String key, String type) {
 		try (var jedis = jedisPool.getResource()) {
 			switch (type) {
-				case "search" -> {
-					var prefix = "search:";
-					jedis.del(prefix + key);
+				case REDIS_SEARCH -> {
+					jedis.del(REDIS_SEARCH + ":" + key);
 				}
-				case "source" -> {
-					var prefix = "source:";
-					jedis.del(prefix + key);
+				case REDIS_SOURCE -> {
+					jedis.del(REDIS_SOURCE + ":" + key);
+				}
+				case REDIS_NON_EXIST -> {
+					jedis.del(REDIS_NON_EXIST + ":" + key);
 				}
 			}
 		}
@@ -98,8 +103,9 @@ public class Redis {
 
 	public void deleteAll() {
 		try (var jedis = jedisPool.getResource()) {
-			jedis.keys("search:*").forEach(jedis::del);
-			jedis.keys("source:*").forEach(jedis::del);
+			jedis.keys(REDIS_SOURCE + ":*").forEach(jedis::del);
+			jedis.keys(REDIS_SEARCH + ":*").forEach(jedis::del);
+			jedis.keys(REDIS_NON_EXIST + ":*").forEach(jedis::del);
 		}
 	}
 }

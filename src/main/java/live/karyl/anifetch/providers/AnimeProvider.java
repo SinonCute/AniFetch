@@ -29,6 +29,7 @@ public abstract class AnimeProvider {
 
 	protected final String REDIS_SEARCH = "search";
 	protected final String REDIS_SOURCE = "source";
+	protected final String REDIS_NON_EXIST = "non_exist";
 
 
 	protected final OkHttp connection = AniFetchApplication.getConnection();

@@ -35,6 +35,10 @@ public class AnimeVietsub extends AnimeProvider {
 		titles.put("english", anilistInfo.getTitle().english);
 		titles.put("romaji", anilistInfo.getTitle().romaji);
 
+		if (redis.exists(redisId, REDIS_NON_EXIST)) {
+			return null;
+		}
+
 		if (redis.exists(redisId, "search")) {
 			animeParser = new Gson().fromJson(redis.get(redisId, "search"), AnimeParser.class);
 			if (animeParser != null) return animeParser;
@@ -66,6 +70,9 @@ public class AnimeVietsub extends AnimeProvider {
 					break;
 				}
 			}
+		}
+		if (animeParser == null) {
+			redis.set(redisId, "null", REDIS_NON_EXIST);
 		}
 		return animeParser;
 	}

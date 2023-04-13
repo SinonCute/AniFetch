@@ -40,6 +40,10 @@ public class Bilibili extends AnimeProvider {
 		titles.put("english", anilistInfo.getTitle().english);
 		titles.put("romaji", anilistInfo.getTitle().romaji);
 
+		if (redis.exists(redisId, REDIS_NON_EXIST)) {
+			return null;
+		}
+
 		if (redis.exists(redisId, REDIS_SEARCH)) {
 			animeParser = new Gson().fromJson(redis.get(redisId, REDIS_SEARCH), AnimeParser.class);
 			if (animeParser != null) return animeParser;
@@ -70,6 +74,9 @@ public class Bilibili extends AnimeProvider {
 					break;
 				}
 			}
+		}
+		if (animeParser == null) {
+			redis.set(redisId, "null", REDIS_NON_EXIST);
 		}
 		return animeParser;
 	}
