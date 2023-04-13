@@ -8,21 +8,39 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 public class GraphqlService {
 
 	@QueryMapping("animeSearch")
-	public CompletableFuture<Results> animeSearch(@Argument String id) {
+//	public CompletableFuture<Results> animeSearch(@Argument String id) {
+//		System.out.println("Searching for " + id);
+//		CompletableFuture<Results> future = Utils.searchAllAsync(id)
+//				.thenApplyAsync(animeParsers -> {
+//					if (animeParsers.isEmpty()) {
+//						System.out.println("No results found");
+//						return new Results(0, false, null);
+//					} else {
+//						System.out.println("Found " + animeParsers.size() + " results");
+//						return new Results(animeParsers.size(), true, animeParsers);
+//					}
+//				});
+//		return future.orTimeout(20, TimeUnit.SECONDS).exceptionally(e -> {
+//			System.out.println("Error: " + e.getMessage());
+//			return new Results(0, false, null);
+//		});
+//	}
+	public Results animeSearch(@Argument String id) {
 		System.out.println("Searching for " + id);
-		return Utils.searchAllAsync(id)
-				.thenApplyAsync(animeParsers -> {
-					if (animeParsers.isEmpty()) {
-						return new Results(0, false, null);
-					} else {
-						return new Results(animeParsers.size(), true, animeParsers);
-					}
-				});
+		var animeParsers = Utils.searchAll(id);
+		if (animeParsers.isEmpty()) {
+			System.out.println("No results found");
+			return new Results(0, false, null);
+		} else {
+			System.out.println("Found " + animeParsers.size() + " results");
+			return new Results(animeParsers.size(), true, animeParsers);
+		}
 	}
 
 	@QueryMapping("source")

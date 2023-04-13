@@ -16,6 +16,7 @@ import okhttp3.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 public abstract class AnimeProvider {
@@ -59,7 +60,7 @@ public abstract class AnimeProvider {
 							.post(requestBody)
 							.build();
 					Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
-					return Jsoup.parse(response.body().string());
+					return Jsoup.parse(new String(response.body().bytes(), StandardCharsets.UTF_8));
 				} catch (Exception e) {
 					e.printStackTrace();
 					return null;
@@ -82,10 +83,12 @@ public abstract class AnimeProvider {
         } else if (s.contains("full")) {
             return 1;
         } else if (s.startsWith("e")) {
-            return Integer.parseInt(s.replace("e", ""));
-        } else {
+	        return Integer.parseInt(s.replace("e", ""));
+        } else if (s.contains("_")) {
+			return Integer.parseInt(s.split("_")[0]);
+		} else {
 			return Integer.parseInt(s);
-        }
+		}
     }
 
 	public String getSiteName() { return siteName; }

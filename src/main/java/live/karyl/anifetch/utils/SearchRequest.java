@@ -11,6 +11,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 public class SearchRequest {
 
@@ -161,9 +162,14 @@ public class SearchRequest {
 
 	public static String[] bilibili(String key) {
 		try {
+			//Dev bilibili ngu vailoz, can tao day thuat toan khong?
+			if (key == null) return new String[0];
+			key = key.toLowerCase(Locale.ROOT);
+			String keyTrimmed = key.substring(0, key.length() / 2);
+			String suggestURL = "https://api.bilibili.tv/intl/gateway/web/v2/search_v2/suggest?s_locale=en_US&platform=web&keyword=" + keyTrimmed;
 			String searchURL = "https://api.bilibili.tv/intl/gateway/web/v2/search_v2/anime?s_locale=en_US&platform=web&keyword=%s&highlight=1&pn=1&ps=20".formatted(key);
 			RequestBody requestBody = new FormBody.Builder()
-					.addEncoded("url", searchURL)
+					.addEncoded("url", suggestURL)
 					.addEncoded("method", "GET")
 					.addEncoded("header-user-agent", USER_AGENT)
 					.build();
@@ -172,6 +178,21 @@ public class SearchRequest {
 					.post(requestBody)
 					.build();
 			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
+			var jsonObjectSuggest = new Gson().fromJson(response.body().string(), JsonObject.class);
+			if (jsonObjectSuggest.getAsJsonObject("data").get("items").isJsonNull()) {
+				System.out.println("No suggestion found on bilibili so skip searching to save time");
+				return new String[0];
+			}
+			requestBody = new FormBody.Builder()
+					.addEncoded("url", searchURL)
+					.addEncoded("method", "GET")
+					.addEncoded("header-user-agent", USER_AGENT)
+					.build();
+			request = new Request.Builder()
+					.url(PROXY_VN)
+					.post(requestBody)
+					.build();
+			response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
 			if (response.code() != 200) {
 				System.out.println("Request failed");
 				return null;

@@ -1,19 +1,15 @@
 package live.karyl.anifetch.database;
 
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.Jedis;
+
 
 public class Redis {
 
-	private JedisPool jedisPool;
+	private Jedis jedis;
 
 	public void init() {
-		JedisPoolConfig config = new JedisPoolConfig();
-		config.setMaxTotal(128);
-		config.setMaxIdle(128);
-		config.setMinIdle(16);
-		jedisPool = new JedisPool(config, "100.100.187.19", 6379, 10000);
-		if (!isConnected()) {
+		jedis = new Jedis("100.127.255.19", 6379);
+		if (!jedis.ping().equals("PONG")) {
 			System.out.println("Redis is not connected");
 		} else {
 			System.out.println("Redis is connected");
@@ -21,27 +17,22 @@ public class Redis {
 	}
 
 	public void set(String key, String value, String type) {
-		if (!isConnected()) return;
 		System.out.println("SET | " + key + " - " + type + "");
-		var jedis = jedisPool.getResource();
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
-				jedis.set(prefix + key, value);
-				jedis.expire(key, 43200); // 12 hours
+				jedis.setex(prefix + key, 43200, value); // 12 hours
 			}
 			case "source" -> {
 				var prefix = "source:";
-				jedis.set(prefix + key, value);
-				jedis.expire(key, 3600); // 1 hour
+				jedis.setex(prefix + key, 43200, value); // 12 hours
 			}
 		}
+		jedis.close();
 	}
 
 	public String get(String key, String type) {
-		if (!isConnected()) return null;
 		System.out.println("GET | " + key + " - " + type + "");
-		var jedis = jedisPool.getResource();
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
@@ -52,13 +43,12 @@ public class Redis {
 				return jedis.get(prefix + key);
 			}
 		}
+		jedis.close();
 		return null;
 	}
 
 	public boolean exists(String key, String type) {
-		if (!isConnected()) return false;
 		System.out.println("EXISTS | " + key + " - " + type + "");
-		var jedis = jedisPool.getResource();
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
@@ -69,11 +59,11 @@ public class Redis {
 				return jedis.exists(prefix + key);
 			}
 		}
+		jedis.close();
 		return false;
 	}
 
 	public void delete(String key, String type) {
-		var jedis = jedisPool.getResource();
 		switch (type) {
 			case "search" -> {
 				var prefix = "search:";
@@ -84,15 +74,13 @@ public class Redis {
 				jedis.del(prefix + key);
 			}
 		}
+		jedis.close();
 	}
 
 	public void deleteAll() {
-		var jedis = jedisPool.getResource();
 		jedis.keys("search:*").forEach(jedis::del);
 		jedis.keys("source:*").forEach(jedis::del);
+		jedis.close();
 	}
 
-	public boolean isConnected() {
-		return jedisPool.getResource().isConnected();
-	}
 }

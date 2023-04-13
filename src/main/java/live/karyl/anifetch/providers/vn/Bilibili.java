@@ -14,6 +14,7 @@ import okhttp3.FormBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -202,23 +203,34 @@ public class Bilibili extends AnimeProvider {
 	}
 
 	private boolean compareResult(AnilistInfo anilistInfo, Document mainPage, String type) {
-		if (mainPage == null) return false;
+		if (mainPage == null) {
+			System.out.println("Main page is null");
+			return false;
+		}
 		var year = Integer.parseInt(mainPage.select(".bstar-meta__create-time").text().split(",")[1].trim());
-		var originalTitle = mainPage.select(".bstar-meta__origin-name-content").text();
+		var alias = "";
 		var title = mainPage.select(".bstar-meta__ogv-title").text();
 		var episode = mainPage.select(".ep-list > .ep-item").size();
+
+		var alias_ = mainPage.select(".bstar-meta__alias-item");
+		alias = String.join(",", alias_.stream().map(Element::text).toList());
 
 		if (type.equals("english")) {
 			return year == anilistInfo.getReleaseDate()
 					&& Utils.checkNumberEqual(episode, anilistInfo.getCurrentEpisode())
 					&& Utils.matchedRate(title, anilistInfo.getTitle().english) > 0.5;
-		} else if (anilistInfo.getTitle().nativeTitle != null) {
+		}
+
+		if (!alias.isEmpty()) {
+			String b = String.join(",", anilistInfo.getTitle().nativeTitle, anilistInfo.getTitle().romaji, anilistInfo.getTitle().english);
 			return year == anilistInfo.getReleaseDate()
 					&& Utils.checkNumberEqual(episode, anilistInfo.getCurrentEpisode())
-					&& Utils.matchedRate(originalTitle, anilistInfo.getTitle().nativeTitle) > 0.6;
+					&& Utils.matchedRate(alias, b) > 0.6;
 		}
+
 		return year == anilistInfo.getReleaseDate()
 				&& Utils.checkNumberEqual(episode, anilistInfo.getCurrentEpisode())
 				&& Utils.matchedRate(title, anilistInfo.getTitle().romaji) > 0.5;
+
 	}
 }

@@ -47,11 +47,11 @@ public class AniFetchApplication {
 	}
 
 	public static void init() {
+		providers.put("Bilibili", new Bilibili());
 		providers.put("AnimeTVN", new AnimeTVN());
 		providers.put("WebLinhTinh", new WebLinhTinh());
 		providers.put("AnimeHay", new AnimeHay());
 		providers.put("AnimeVietsub", new AnimeVietsub());
-		providers.put("Bilibili", new Bilibili());
 	}
 
 	public static File getDataFolder() {

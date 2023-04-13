@@ -51,6 +51,7 @@ public class ConfigManager {
 	}
 
 	public void init() {
+		saveDefaultConfig();
 		File file = new File(AniFetchApplication.getDataFolder(), "config.yml");
 		YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
 

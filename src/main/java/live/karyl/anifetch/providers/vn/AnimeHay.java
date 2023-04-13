@@ -91,7 +91,7 @@ public class AnimeHay extends AnimeProvider {
 			if (link.contains("suckplayer")) {
 				var data = firePlayer(link);
 				if (data.length == 0) continue;
-				var videoResource = new VideoResource(data[0], "720P", "suckplayer", VideoType.MP4);
+				var videoResource = new VideoResource(data[0], "720P", "suckplayer", VideoType.HLS);
 				videoResource.setUseHeader(true);
 				animeSource.addHeader("Cookie", data[1]);
 				animeSource.addVideoResource(videoResource);
@@ -180,7 +180,7 @@ public class AnimeHay extends AnimeProvider {
 			JSONObject links = (JSONObject) jsonParser.parse(response.body().string());
 			var link = links.get("videoSource").toString();
 			response.close();
-			return new String[]{link, "Cookie: fireplayer=" + token};
+			return new String[]{link, "fireplayer=" + token};
 		} catch (Exception e) {
 			Logger.error(e);
 			return new String[]{};
