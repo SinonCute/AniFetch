@@ -69,9 +69,9 @@ public class ConfigManager {
 
 		redisHost = yaml.getString("redis.host");
 		redisPort = yaml.getInt("redis.port");
-		redisPoolSizeMax = yaml.getInt("redis.pool.size.max");
-		redisPoolSizeMin = yaml.getInt("redis.pool.size.min");
-		redisPoolSizeIdle = yaml.getInt("redis.pool.size.idle");
+		redisPoolSizeMax = yaml.getInt("redis.pool.max");
+		redisPoolSizeMin = yaml.getInt("redis.pool.min");
+		redisPoolSizeIdle = yaml.getInt("redis.pool.idle");
 
 		blacklist = yaml.getStringList("blacklist");
 
