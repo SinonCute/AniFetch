@@ -37,9 +37,17 @@ public class AnimeSource {
 		this.videoResources.addAll(videoResources);
 	}
 
+	public List<VideoResource> getVideoResources() {
+		return videoResources;
+	}
+
 	public void setAudioResources(List<AudioResource> audioResources) {
 		this.audioResources.clear();
 		this.audioResources.addAll(audioResources);
+	}
+
+	public List<AudioResource> getAudioResources() {
+		return audioResources;
 	}
 
 	public void setSubtitles(List<Subtitle> subtitles) {
@@ -83,6 +91,10 @@ public class AnimeSource {
 			}
 		}
 		headers.add(new Header(key, List.of(value)));
+	}
+
+	public List<Header> getHeaders() {
+		return headers;
 	}
 
 
