@@ -8,8 +8,8 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.StringWriter;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 public class DashPlayerCreator {
 
@@ -21,6 +21,8 @@ public class DashPlayerCreator {
             int group = 1;
             int adaptationSet = 1;
             int representation = 0;
+            var duration = Duration.ofMillis(animeSource.getVideoResources().get(0).getDuration());
+            var durationString = "PT" + duration.toHours() + "H" + duration.toMinutesPart() + "M" + duration.toSecondsPart() + "S";
 
             XMLOutputFactory factory = XMLOutputFactory.newInstance();
             StringWriter writer = new StringWriter();
@@ -35,11 +37,11 @@ public class DashPlayerCreator {
             xmlWriter.writeAttribute("profiles", "urn:mpeg:dash:profile:isoff-on-demand:2011");
             xmlWriter.writeAttribute("minBufferTime", "PT1M");
             xmlWriter.writeAttribute("type", "static");
-            xmlWriter.writeAttribute("mediaPresentationDuration", "PT0H24M40S");
+            xmlWriter.writeAttribute("mediaPresentationDuration", durationString);
 
             // Write the video adaptation set
             xmlWriter.writeStartElement("Period");
-            xmlWriter.writeAttribute("duration", "PT0H24M40S");
+            xmlWriter.writeAttribute("duration", durationString);
             xmlWriter.writeStartElement("AdaptationSet");
             xmlWriter.writeAttribute("id", String.valueOf(adaptationSet));
             xmlWriter.writeAttribute("group", String.valueOf(group));
@@ -66,15 +68,21 @@ public class DashPlayerCreator {
 
                 xmlWriter.writeStartElement("Representation");
                 xmlWriter.writeAttribute("id", String.valueOf(representation));
-                xmlWriter.writeAttribute("mimeType", "video/mp4");
-                xmlWriter.writeAttribute("sar", "1:1");
+                xmlWriter.writeAttribute("mimeType", source.getMimeType());
+                xmlWriter.writeAttribute("sar", source.getSar());
+                xmlWriter.writeAttribute("codecs", source.getCodecs());
+                xmlWriter.writeAttribute("width", String.valueOf(source.getWidth()));
+                xmlWriter.writeAttribute("height", String.valueOf(source.getHeight()));
+                xmlWriter.writeAttribute("frameRate", source.getFrameRate());
+                xmlWriter.writeAttribute("bandwidth", String.valueOf(source.getBandwidth()));
                 xmlWriter.writeStartElement("BaseURL");
                 xmlWriter.writeCharacters(videoUrl);
                 xmlWriter.writeEndElement(); // BaseURL
                 xmlWriter.writeStartElement("SegmentBase");
                 xmlWriter.writeAttribute("indexRangeExact", "true");
+                xmlWriter.writeAttribute("indexRange", source.getIndexRange());
                 xmlWriter.writeStartElement("Initialization");
-                xmlWriter.writeAttribute("range", "0-995");
+                xmlWriter.writeAttribute("range", source.getRange());
                 xmlWriter.writeEndElement(); // Initialization
                 xmlWriter.writeEndElement(); // SegmentBase
                 xmlWriter.writeEndElement(); // Representation
@@ -104,10 +112,19 @@ public class DashPlayerCreator {
 
                 xmlWriter.writeStartElement("Representation");
                 xmlWriter.writeAttribute("id", String.valueOf(representation));
-                xmlWriter.writeAttribute("mimeType", "audio/mp4");
+                xmlWriter.writeAttribute("mimeType", source.getMimeType());
+                xmlWriter.writeAttribute("codecs", source.getCodecs());
+                xmlWriter.writeAttribute("bandwidth", String.valueOf(source.getBandwidth()));
                 xmlWriter.writeStartElement("BaseURL");
                 xmlWriter.writeCharacters(audioUrl);
                 xmlWriter.writeEndElement(); // BaseURL
+                xmlWriter.writeStartElement("SegmentBase");
+                xmlWriter.writeAttribute("indexRangeExact", "true");
+                xmlWriter.writeAttribute("indexRange", source.getIndexRange());
+                xmlWriter.writeStartElement("Initialization");
+                xmlWriter.writeAttribute("range", source.getRange());
+                xmlWriter.writeEndElement(); // Initialization
+                xmlWriter.writeEndElement(); // SegmentBase
                 xmlWriter.writeEndElement(); // Representation
                 representation++;
             }

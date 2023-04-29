@@ -3,8 +3,18 @@ package live.karyl.anifetch.models;
 import live.karyl.anifetch.types.VideoType;
 
 public class VideoResource {
+	private int duration;
+	private int bandwidth;
 	private String url;
 	private String backupUrl;
+	private String codecs;
+	private String sar;
+	private String frameRate;
+	private String range;
+	private String indexRange;
+	private int width;
+	private int height;
+	private String mimeType;
 	private String quality;
 	private String serverId;
 	private String audioQuality;
@@ -18,6 +28,86 @@ public class VideoResource {
 		this.quality = quality;
 		this.serverId = serverId;
 		this.videoType = videoType;
+	}
+
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
+
+	public int getDuration() {
+		return duration;
+	}
+
+	public void setBandwidth(int bandwidth) {
+		this.bandwidth = bandwidth;
+	}
+
+	public int getBandwidth() {
+		return bandwidth;
+	}
+
+	public void setCodecs(String codecs) {
+		this.codecs = codecs;
+	}
+
+	public String getCodecs() {
+		return codecs;
+	}
+
+	public void setSar(String sar) {
+		this.sar = sar;
+	}
+
+	public String getSar() {
+		return sar;
+	}
+
+	public void setFrameRate(String frameRate) {
+		this.frameRate = frameRate;
+	}
+
+	public String getFrameRate() {
+		return frameRate;
+	}
+
+	public void setRange(String range) {
+		this.range = range;
+	}
+
+	public String getRange() {
+		return range;
+	}
+
+	public void setIndexRange(String indexRange) {
+		this.indexRange = indexRange;
+	}
+
+	public String getIndexRange() {
+		return indexRange;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
+
+	public String getMimeType() {
+		return mimeType;
 	}
 
 	public String getUrl() {

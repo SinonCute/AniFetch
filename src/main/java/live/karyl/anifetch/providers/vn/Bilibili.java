@@ -134,12 +134,32 @@ public class Bilibili extends AnimeProvider {
 
 			videoArray.forEach(video -> {
 				var videoObject = video.getAsJsonObject().getAsJsonObject("video_resource");
+				var duration = videoObject.get("duration").getAsInt();
+				var bandwidth = videoObject.get("bandwidth").getAsInt();
 				var videoUrl = videoObject.get("url").getAsString();
 				var videoUrlBackup = videoObject.get("backup_url").getAsJsonArray().get(0).getAsString();
+				var codecs = videoObject.get("codecs").getAsString();
+				var sar = videoObject.get("sar").getAsString();
+				var frameRate = videoObject.get("frame_rate").getAsString();
+				var range = videoObject.getAsJsonObject("segment_base").get("range").getAsString();
+				var indexRange = videoObject.getAsJsonObject("segment_base").get("index_range").getAsString();
+				var width = videoObject.get("width").getAsInt();
+				var height = videoObject.get("height").getAsInt();
+				var mimeTypes = videoObject.get("mime_type").getAsString();
 				var videoQuality = video.getAsJsonObject().getAsJsonObject("stream_info").get("desc_words").getAsString();
 				var audioQuality = video.getAsJsonObject().get("audio_quality").getAsString();
 				var videoType = VideoType.DASH;
 				var videoResource = new VideoResource(videoUrl, videoQuality, "bilibili", videoType);
+				videoResource.setDuration(duration);
+				videoResource.setBandwidth(bandwidth);
+				videoResource.setMimeType(mimeTypes);
+				videoResource.setSar(sar);
+				videoResource.setFrameRate(frameRate);
+				videoResource.setRange(range);
+				videoResource.setIndexRange(indexRange);
+				videoResource.setWidth(width);
+				videoResource.setHeight(height);
+				videoResource.setCodecs(codecs);
 				videoResource.setBackupUrl(videoUrlBackup);
 				videoResource.setAudioQuality(audioQuality);
 				videoResource.setUseHeader(true);
@@ -148,10 +168,20 @@ public class Bilibili extends AnimeProvider {
 
 			audioArray.forEach(audio -> {
 				var audioObject = audio.getAsJsonObject();
+				var bandwidth = audioObject.get("bandwidth").getAsInt();
+				var codecs = audioObject.get("codecs").getAsString();
+				var range = audioObject.getAsJsonObject("segment_base").get("range").getAsString();
+				var indexRange = audioObject.getAsJsonObject("segment_base").get("index_range").getAsString();
+				var mimeType = audioObject.get("mime_type").getAsString();
 				var audioUrl = audioObject.get("url").getAsString();
 				var audioUrlBackup = audioObject.get("backup_url").getAsJsonArray().get(0).getAsString();
 				var audioQuality = audioObject.get("quality").getAsString();
 				var audioResource = new AudioResource(audioUrl, audioQuality);
+				audioResource.setBandwidth(bandwidth);
+				audioResource.setCodecs(codecs);
+				audioResource.setRange(range);
+				audioResource.setIndexRange(indexRange);
+				audioResource.setMimeType(mimeType);
 				audioResource.setBackupUrl(audioUrlBackup);
 				audioResources.add(audioResource);
 			});
