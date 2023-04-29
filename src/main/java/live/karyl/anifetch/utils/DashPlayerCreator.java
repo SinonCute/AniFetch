@@ -34,13 +34,14 @@ public class DashPlayerCreator {
             // Write the root element
             xmlWriter.writeStartElement("MPD");
             xmlWriter.writeAttribute("xmlns", "urn:mpeg:dash:schema:mpd:2011");
-            xmlWriter.writeAttribute("profiles", "urn:mpeg:dash:profile:isoff-on-demand:2011");
-            xmlWriter.writeAttribute("minBufferTime", "PT1M");
+            xmlWriter.writeAttribute("profiles", "urn:mpeg:dash:profile:full:2011");
+            xmlWriter.writeAttribute("minBufferTime", "PT2S");
             xmlWriter.writeAttribute("type", "static");
             xmlWriter.writeAttribute("mediaPresentationDuration", durationString);
 
             // Write the video adaptation set
             xmlWriter.writeStartElement("Period");
+            xmlWriter.writeAttribute("start", "PT0S");
             xmlWriter.writeAttribute("duration", durationString);
             xmlWriter.writeStartElement("AdaptationSet");
             xmlWriter.writeAttribute("id", String.valueOf(adaptationSet));
@@ -59,11 +60,14 @@ public class DashPlayerCreator {
             for (var source : animeSource.getVideoResources()) {
 
                 String videoUrl = source.getUrl();
+                String quality = source.getQuality();
 
-                if (source.isUseHeader()) {
+                if (quality.equals("4k")) {
+                    videoUrl = source.getUrl();
+                } else if (source.isUseHeader() && !source.getUrl().contains("-bstar1-")) {
                     String headers = new Gson().toJson(animeSource.getHeaders());
                     videoUrl = PROXY_URL + new URLEncoder().encode(source.getUrl() ,StandardCharsets.UTF_8)
-                            +  "&header=" + headers;
+                            +  "&header=" + headers + "&replace=true";
                 }
 
                 xmlWriter.writeStartElement("Representation");
@@ -107,8 +111,8 @@ public class DashPlayerCreator {
             for (var source : animeSource.getAudioResources()) {
 
                 String headers = new Gson().toJson(animeSource.getHeaders());
-                String audioUrl = PROXY_URL + new URLEncoder().encode(source.getUrl() ,StandardCharsets.UTF_8)
-                        +  "&header=" + headers;
+                String audioUrl = PROXY_URL + new URLEncoder().encode(source.getBackupUrl(), StandardCharsets.UTF_8)
+                        +  "&header=" + headers + "&replace=true";
 
                 xmlWriter.writeStartElement("Representation");
                 xmlWriter.writeAttribute("id", String.valueOf(representation));
