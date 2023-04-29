@@ -27,7 +27,7 @@ public class AnimeHay extends AnimeProvider {
 	private static final String PLAYER_API = "https://suckplayer.xyz/player/index.php?data=%s&do=getVideo";
 
 	public AnimeHay() {
-		super("AnimeHay", "AH","https://animehay.live/");
+		super("AnimeHay", "AH","https://animehay.fan/");
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class AnimeHay extends AnimeProvider {
 
 		if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
 			var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
-			var episodes = extractEpisodeIds("https://animehay.live/thong-tin-phim/a-" + id + ".html");
+			var episodes = extractEpisodeIds(baseUrl + "thong-tin-phim/a-" + id + ".html");
 			animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
 			animeParser.setEpisodes(episodes);
 			redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
@@ -91,7 +91,7 @@ public class AnimeHay extends AnimeProvider {
 			return new Gson().fromJson(jsonData, AnimeSource.class);
 		}
 
-		var mainPage = connect("https://animehay.live/xem-phim/a-" + value + ".html", siteName);
+		var mainPage = connect(baseUrl + "xem-phim/a-" + value + ".html", siteName);
 		Pattern p = Pattern.compile("(?i)(?<=['\"(])(https?://\\S+)(?=['\")])");
 		Matcher m = p.matcher(mainPage.html());
 		while (m.find()) {
