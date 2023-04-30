@@ -24,7 +24,7 @@ import java.util.Map;
 public class AnimeVietsub extends AnimeProvider {
 
 	public AnimeVietsub() {
-		super("AnimeVietsub", "AVS","https://animevietsub.in/");
+		super("AnimeVietsub", "AVS","https://animevietsub.im/");
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class AnimeVietsub extends AnimeProvider {
 
 		if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
 			var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
-			var episodes = extractEpisodeIds("https://animevietsub.in/phim/a-a" + id + "/");
+			var episodes = extractEpisodeIds(baseUrl + "phim/a-a" + id + "/");
 			animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
 			animeParser.setEpisodes(episodes);
 			redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
@@ -91,7 +91,7 @@ public class AnimeVietsub extends AnimeProvider {
 			}
 
 			RequestBody requestBody = new FormBody.Builder()
-					.addEncoded("url", "https://animevietsub.in/ajax/player?v=2019a")
+					.addEncoded("url", baseUrl + "ajax/player?v=2019a")
 					.addEncoded("method", "POST")
 					.addEncoded("body-episodeId", episodeId)
 					.addEncoded("body-backup", "1")
@@ -111,7 +111,7 @@ public class AnimeVietsub extends AnimeProvider {
 				try {
 					var dataLink = element.attr("data-href");
 					RequestBody requestBodyLink = new FormBody.Builder()
-							.addEncoded("url", "https://animevietsub.in/ajax/player?v=2019a")
+							.addEncoded("url", baseUrl + "ajax/player?v=2019a")
 							.addEncoded("method", "POST")
 							.addEncoded("body-link", dataLink)
 							.addEncoded("body-id", animeId)
@@ -132,8 +132,8 @@ public class AnimeVietsub extends AnimeProvider {
 						var link = file.replace("//", "https://");
 						var videoResource = new VideoResource(link, "720P", "DU", VideoType.HLS);
 						videoResource.setUseHeader(true);
-						animeSource.addHeader("Origin", "https://animevietsub.in/");
-						animeSource.addHeader("Referer", "https://animevietsub.in/");
+						animeSource.addHeader("Origin", "https://animevietsub.im/");
+						animeSource.addHeader("Referer", "https://animevietsub.im/");
 						animeSource.addVideoResource(videoResource);
 					}
 					if (file.contains("fbcdn.net")) {

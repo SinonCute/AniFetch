@@ -35,7 +35,7 @@ public class DashPlayerCreator {
             xmlWriter.writeStartElement("MPD");
             xmlWriter.writeAttribute("xmlns", "urn:mpeg:dash:schema:mpd:2011");
             xmlWriter.writeAttribute("profiles", "urn:mpeg:dash:profile:full:2011");
-            xmlWriter.writeAttribute("minBufferTime", "PT2S");
+            xmlWriter.writeAttribute("minBufferTime", "PT1M");
             xmlWriter.writeAttribute("type", "static");
             xmlWriter.writeAttribute("mediaPresentationDuration", durationString);
 
@@ -111,7 +111,7 @@ public class DashPlayerCreator {
             for (var source : animeSource.getAudioResources()) {
 
                 String headers = new Gson().toJson(animeSource.getHeaders());
-                String audioUrl = PROXY_URL + new URLEncoder().encode(source.getBackupUrl(), StandardCharsets.UTF_8)
+                String audioUrl = PROXY_URL + new URLEncoder().encode(source.getUrl(), StandardCharsets.UTF_8)
                         +  "&header=" + headers + "&replace=true";
 
                 xmlWriter.writeStartElement("Representation");
