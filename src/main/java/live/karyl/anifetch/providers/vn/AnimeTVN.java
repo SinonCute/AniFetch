@@ -32,7 +32,7 @@ public class AnimeTVN extends AnimeProvider {
 
 
 	public AnimeTVN() {
-		super("AnimeTVN", "ATVN","https://animetvn.xyz/");
+		super("AnimeTVN", "ATVN","https://animetvn.in/");
 		token = new String[2];
 		requestToken();
 	}
@@ -56,7 +56,7 @@ public class AnimeTVN extends AnimeProvider {
 
 		if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
 			var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
-			var episodes = extractEpisodeIds("https://animetvn.xyz/thong-tin-phim/f" + id + "-a.html");
+			var episodes = extractEpisodeIds(baseUrl + "thong-tin-phim/f" + id + "-a.html");
 			animeParser = new AnimeParser(anilistInfo.getId(), id,  siteId, siteName);
 			animeParser.setEpisodes(episodes);
 			redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
@@ -200,7 +200,7 @@ public class AnimeTVN extends AnimeProvider {
 		try {
 			String url = "https://api-plhq.playhbq.xyz/apiv4/" + ANIME_TVN_USER_ID + "/" + fileID;
 			RequestBody requestBody = new FormBody.Builder()
-					.addEncoded("referrer", "https://animetvn.xyz")
+					.addEncoded("referrer", baseUrl)
 					.addEncoded("typeend", "html")
 					.build();
 			Request request = new Request.Builder()
@@ -228,12 +228,12 @@ public class AnimeTVN extends AnimeProvider {
 			String url;
 			FormBody req;
 			if (multiServer) {
-				url = "https://animetvn.xyz/ajax/getExtraLinks";
+				url = baseUrl + "ajax/getExtraLinks";
 				req = new FormBody.Builder()
 						.addEncoded("epid", data)
 						.build();
 			} else {
-				url = "https://animetvn.xyz/ajax/getExtraLink";
+				url = baseUrl + "ajax/getExtraLink";
 				req = new FormBody.Builder()
 						.addEncoded("id", data.split(",")[0])
 						.addEncoded("link", data.split(",")[1])
