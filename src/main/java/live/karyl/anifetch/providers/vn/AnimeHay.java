@@ -1,6 +1,7 @@
 package live.karyl.anifetch.providers.vn;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import live.karyl.anifetch.models.*;
 import live.karyl.anifetch.providers.AnimeProvider;
 import live.karyl.anifetch.types.AudioType;
@@ -10,8 +11,6 @@ import live.karyl.anifetch.utils.SearchRequest;
 import live.karyl.anifetch.utils.Utils;
 import okhttp3.FormBody;
 import okhttp3.Request;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.jsoup.nodes.Document;
 import org.tinylog.Logger;
 
@@ -86,10 +85,10 @@ public class AnimeHay extends AnimeProvider {
 		AnimeSource animeSource = new AnimeSource(siteName);
 		String redisId = siteName + "$" + value;
 
-		if (redis.exists(redisId, REDIS_SOURCE)) {
-			String jsonData = redis.get(redisId, REDIS_SOURCE);
-			return new Gson().fromJson(jsonData, AnimeSource.class);
-		}
+//		if (redis.exists(redisId, REDIS_SOURCE)) {
+//			String jsonData = redis.get(redisId, REDIS_SOURCE);
+//			return new Gson().fromJson(jsonData, AnimeSource.class);
+//		}
 
 		var mainPage = connect(baseUrl + "xem-phim/a-" + value + ".html", siteName);
 		Pattern p = Pattern.compile("(?i)(?<=['\"(])(https?://\\S+)(?=['\")])");
@@ -163,32 +162,24 @@ public class AnimeHay extends AnimeProvider {
 
 	private String[] firePlayer(String src) {
 		try {
+			System.out.println(src);
 			var id = src.split("/")[4];
-			var request = new Request.Builder()
-					.url(String.format(PLAYER_API, id))
-					.addHeader("user-agent", USER_AGENT)
-					.build();
-			var response = connection.callWithoutRateLimit(request);
-			var token = response.headers().get("Set-Cookie").split("=")[1].split(";")[0];
-			response.close();
 			var body = new FormBody.Builder()
+					.add("r", baseUrl)
 					.add("hash", id)
 					.build();
-			request = new Request.Builder()
+			var request = new Request.Builder()
 					.url(String.format(PLAYER_API, id))
-					.addHeader("Cookie", "fireplayer_player=" + token)
-					.addHeader("x-requested-with", "XMLHttpRequest")
-					.addHeader("user-agent", USER_AGENT)
 					.post(body)
+					.addHeader("user-agent", USER_AGENT)
+					.addHeader("X-Requested-With", "XMLHttpRequest")
 					.build();
-			response = connection.callWithoutRateLimit(request);
-
-			// parse json
-			JSONParser jsonParser = new JSONParser();
-			JSONObject links = (JSONObject) jsonParser.parse(response.body().string());
-			var link = links.get("videoSource").toString();
+			var response = connection.callWithoutRateLimit(request);
+			var token = response.header("Set-Cookie").split(";")[0];
+			var jsonObject = new Gson().fromJson(response.body().string(), JsonObject.class);
+			var link = jsonObject.get("videoSource").getAsString();
 			response.close();
-			return new String[]{link, "fireplayer=" + token};
+			return new String[]{link, token};
 		} catch (Exception e) {
 			Logger.error(e);
 			return new String[]{};
