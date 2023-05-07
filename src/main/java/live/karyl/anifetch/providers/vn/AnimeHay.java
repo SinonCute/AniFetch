@@ -85,10 +85,10 @@ public class AnimeHay extends AnimeProvider {
 		AnimeSource animeSource = new AnimeSource(siteName);
 		String redisId = siteName + "$" + value;
 
-//		if (redis.exists(redisId, REDIS_SOURCE)) {
-//			String jsonData = redis.get(redisId, REDIS_SOURCE);
-//			return new Gson().fromJson(jsonData, AnimeSource.class);
-//		}
+		if (redis.exists(redisId, REDIS_SOURCE)) {
+			String jsonData = redis.get(redisId, REDIS_SOURCE);
+			return new Gson().fromJson(jsonData, AnimeSource.class);
+		}
 
 		var mainPage = connect(baseUrl + "xem-phim/a-" + value + ".html", siteName);
 		Pattern p = Pattern.compile("(?i)(?<=['\"(])(https?://\\S+)(?=['\")])");
@@ -162,7 +162,6 @@ public class AnimeHay extends AnimeProvider {
 
 	private String[] firePlayer(String src) {
 		try {
-			System.out.println(src);
 			var id = src.split("/")[4];
 			var body = new FormBody.Builder()
 					.add("r", baseUrl)
