@@ -18,12 +18,12 @@ import java.nio.charset.StandardCharsets;
 public class RestService {
 
     @GetMapping("/stream-bilibili")
-    public ResponseEntity<String> streamBilibili(HttpServletRequest request, @RequestParam("id") String id) {
+    public ResponseEntity<String> streamBilibili(@RequestParam("id") String id) {
         if (id == null) {
             return ResponseEntity.badRequest().body("Missing id");
         }
 
-        var videoSource = AniFetchApplication.getProviders().get("Bilibili").getLink(id);
+        var videoSource = AniFetchApplication.getProviders().get("Bilibili").getLink(id, false);
         var xmlResponse = new DashPlayerCreator().generateDashXML(videoSource);
         return ResponseEntity.ok()
                 .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")

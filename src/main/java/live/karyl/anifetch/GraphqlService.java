@@ -6,6 +6,7 @@ import live.karyl.anifetch.utils.Utils;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
+import org.tinylog.Logger;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -15,30 +16,30 @@ public class GraphqlService {
 
 	@QueryMapping("animeSearch")
 	public CompletableFuture<Results> animeSearch(@Argument String id) {
-		System.out.println("Searching for " + id);
+		Logger.debug("Searching for " + id);
 		CompletableFuture<Results> future = Utils.searchAllAsync(id)
 				.thenApplyAsync(animeParsers -> {
 					if (animeParsers.isEmpty()) {
-						System.out.println("No results found");
+						Logger.debug("No results found on" + id);
 						return new Results(0, false, null);
 					} else {
-						System.out.println("Found " + animeParsers.size() + " results");
+						Logger.debug("Found " + animeParsers.size() + " results on " + id);
 						return new Results(animeParsers.size(), true, animeParsers);
 					}
 				});
 		return future.orTimeout(25, TimeUnit.SECONDS).exceptionally(e -> {
-			System.out.println("Error: " + e.getMessage());
+			Logger.debug("Timeout on " + id);
 			return new Results(0, false, null);
 		});
 	}
 
 	@QueryMapping("source")
 	public AnimeSource source(@Argument String providerId, @Argument String value) {
-		System.out.println("Getting source for " + providerId + " " + value);
+		Logger.debug("Getting source for " + providerId + " " + value);
 		var providers = AniFetchApplication.getProviders().values();
 		for (var provider : providers) {
 			if (provider.getSiteId().equals(providerId)) {
-				return provider.getLink(value);
+				return provider.getLink(value, false);
 			}
 		}
 		return null;

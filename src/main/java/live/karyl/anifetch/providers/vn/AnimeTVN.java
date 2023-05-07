@@ -88,12 +88,12 @@ public class AnimeTVN extends AnimeProvider {
 	}
 
 	@Override
-	public AnimeSource getLink(String value) {
+	public AnimeSource getLink(String value, boolean ignoreCache) {
 		try {
 			AnimeSource animeSource = new AnimeSource(siteName);
 			String redisId = siteName + "$" + value;
 
-			if (redis.exists(redisId, REDIS_SOURCE)) {
+			if (redis.exists(redisId, REDIS_SOURCE) && !ignoreCache) {
 				String jsonData = redis.get(redisId, REDIS_SOURCE);
 				return new Gson().fromJson(jsonData, AnimeSource.class);
 			}

@@ -8,6 +8,7 @@ import okhttp3.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.tinylog.Logger;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -34,14 +35,14 @@ public class SearchRequest {
 					.build();
 			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
 			if (response.code() != 200) {
-				System.out.println("Request failed");
+				Logger.error("Search Request failed - AnimeTVN");
 				return null;
 			}
 			Document doc = Jsoup.parse(response.body().string());
 			Elements elements = doc.select(".film-list > .film_item > .film_item_inner > a");
 
 			if (elements.size() == 0) {
-				System.out.println("No result on animeTVN, trying to search with ajax");
+				Logger.debug("No result on animeTVN, trying to search with ajax");
 				RequestBody requestBody = new FormBody.Builder()
 						.addEncoded("key", key)
 						.build();
@@ -56,8 +57,7 @@ public class SearchRequest {
 				doc = Jsoup.parse(response.body().string());
 				elements = doc.select(".search-list > .item > .image");
 			}
-
-			System.out.println(elements.size() + " results on animeTVN");
+			Logger.debug(elements.size() + " results on animeTVN");
 			return elements.stream().map(element -> element.attr("href")).toArray(String[]::new);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -82,12 +82,12 @@ public class SearchRequest {
 					.build();
 			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
 			if (response.code() != 200) {
-				System.out.println("Request failed");
+				Logger.error("Search Request failed - webLinhTinh");
 				return null;
 			}
 			Document doc = Jsoup.parse(response.body().string());
 			Elements elements = doc.select(".exact_result > a");
-			System.out.println(elements.size() + " results on webLinhTinh");
+			Logger.debug(elements.size() + " results on webLinhTinh");
 			return elements.stream().map(element -> element.attr("href")).toArray(String[]::new);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -112,12 +112,12 @@ public class SearchRequest {
 
 			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
 			if (response.code() != 200) {
-				System.out.println("Request failed");
+				Logger.error("Search Request failed - AnimeHay");
 				return null;
 			}
 			Document doc = Jsoup.parse(response.body().string());
 			Elements elements = doc.select(".movies-list > .movie-item > a");
-			System.out.println(elements.size() + " results on AnimeHay");
+			Logger.debug(elements.size() + " results on AnimeHay");
 			return elements.stream().map(element -> element.attr("href")).toArray(String[]::new);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -146,13 +146,13 @@ public class SearchRequest {
 
 			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
 			if (response.code() != 200) {
-				System.out.println("Request failed");
+				Logger.error("Search Request failed - AnimeVietsub");
 				return null;
 			}
 
 			Document doc = Jsoup.parse(response.body().string());
 			Elements elements = doc.select(".ss-info > a");
-			System.out.println(elements.size() + " results on animeVietsub");
+			Logger.debug(elements.size() + " results on AnimeVietsub");
 			return elements.stream().map(element -> element.attr("href")).toArray(String[]::new);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -180,7 +180,7 @@ public class SearchRequest {
 			Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
 			var jsonObjectSuggest = new Gson().fromJson(response.body().string(), JsonObject.class);
 			if (jsonObjectSuggest.getAsJsonObject("data").get("items").isJsonNull()) {
-				System.out.println("No suggestion found on bilibili so skip searching to save time");
+				Logger.debug("No suggestion found on bilibili so skip searching to save time");
 				return new String[0];
 			}
 			requestBody = new FormBody.Builder()
@@ -194,7 +194,7 @@ public class SearchRequest {
 					.build();
 			response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
 			if (response.code() != 200) {
-				System.out.println("Request failed");
+				Logger.error("Search Request failed - Bilibili");
 				return null;
 			}
 			var jsonObject = new Gson().fromJson(response.body().string(), JsonObject.class);
@@ -204,7 +204,7 @@ public class SearchRequest {
 			for (int i = 0; i < itemsArray.size(); i++) {
 				result[i] = itemsArray.get(i).getAsJsonObject().get("season_id").getAsString();
 			}
-			System.out.println(result.length + " results on bilibili");
+			Logger.debug(result.length + " results on Bilibili");
 			return result;
 		} catch (Exception e) {
 			e.printStackTrace();

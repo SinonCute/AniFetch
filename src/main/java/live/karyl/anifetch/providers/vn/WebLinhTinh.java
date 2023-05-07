@@ -91,12 +91,12 @@ public class WebLinhTinh extends AnimeProvider {
     }
 
     @Override
-    public AnimeSource getLink(String data) {
+    public AnimeSource getLink(String data, boolean ignoreCache) {
         AnimeSource animeSource = new AnimeSource(siteName);
         String redisId = siteName + "$" + data;
 
 
-        if (redis.exists(redisId, REDIS_SOURCE)) {
+        if (redis.exists(redisId, REDIS_SOURCE) && !ignoreCache) {
             String jsonData = redis.get(redisId, REDIS_SOURCE);
             return new Gson().fromJson(jsonData, AnimeSource.class);
         }

@@ -31,7 +31,7 @@ public class PostgreSQL {
             hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
             HikariDataSource ds = new HikariDataSource(hikariConfig);
             sql = ds.getConnection();
-            System.out.println("PostgreSQL connection established");
+            Logger.info("PostgreSQL connection established");
         } catch (Exception e) {
             e.printStackTrace();
         }

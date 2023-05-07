@@ -105,4 +105,31 @@ public class Utils {
     public static boolean checkNumberEqual(int int1, int int2) {
         return Math.abs(int1 - int2) <= 1;
     }
+
+    public static boolean checkURLBilibili(String url) {
+        if (url.contains("-bstar1-")) {
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
+            if (response.code() != 200) {
+                response.close();
+                return false;
+            }
+            response.close();
+            return true;
+        } else {
+            Request request = new Request.Builder()
+                    .url(url)
+                    .header("Referer", "https://www.bilibili.tv/")
+                    .build();
+            Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
+            if (response.code() != 200) {
+                response.close();
+                return false;
+            }
+            response.close();
+            return true;
+        }
+    }
 }

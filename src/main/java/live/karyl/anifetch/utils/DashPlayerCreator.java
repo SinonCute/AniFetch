@@ -17,7 +17,6 @@ public class DashPlayerCreator {
 
     public String generateDashXML(AnimeSource animeSource) {
         try {
-
             int group = 1;
             int adaptationSet = 1;
             int representation = 0;

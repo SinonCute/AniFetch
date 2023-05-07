@@ -47,7 +47,7 @@ public abstract class AnimeProvider {
 
 	public abstract AnimeParser search(AnilistInfo anilistInfo);
 
-	public abstract AnimeSource getLink(String value);
+	public abstract AnimeSource getLink(String value, boolean ignoreCache);
 
 	protected Document connect(String url, String siteName) {
 		switch (siteName) {

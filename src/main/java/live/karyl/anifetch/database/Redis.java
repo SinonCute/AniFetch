@@ -2,6 +2,7 @@ package live.karyl.anifetch.database;
 
 import live.karyl.anifetch.AniFetchApplication;
 import live.karyl.anifetch.config.ConfigManager;
+import org.tinylog.Logger;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -29,14 +30,14 @@ public class Redis {
 		jedisPool = new JedisPool(poolConfig, host, port);
 
 		if (!jedisPool.getResource().ping().equals("PONG")) {
-			System.out.println("Redis is not connected");
+			Logger.error("Redis is not connected");
 		} else {
-			System.out.println("Redis is connected");
+			Logger.info("Redis is connected");
 		}
 	}
 
 	public void set(String key, String value, String type) {
-		System.out.println("SET | " + key + " - " + type + "");
+		Logger.info("REDIS SET | {} - {}", key, type);
 		try (var jedis = jedisPool.getResource()) {
 			switch (type) {
 				case REDIS_SEARCH -> {
@@ -53,7 +54,7 @@ public class Redis {
 	}
 
 	public String get(String key, String type) {
-		System.out.println("GET | " + key + " - " + type + "");
+		Logger.info("REDIS - GET | {} - {}", key, type);
 		try (var jedis = jedisPool.getResource()) {
 			switch (type) {
 				case REDIS_SEARCH -> {
@@ -68,7 +69,7 @@ public class Redis {
 	}
 
 	public boolean exists(String key, String type) {
-		System.out.println("EXISTS | " + key + " - " + type + "");
+		Logger.info("REDIS - CHECK EXISTS | {} - {}", key, type);
 		try (var jedis = jedisPool.getResource()) {
 			switch (type) {
 				case REDIS_SEARCH -> {

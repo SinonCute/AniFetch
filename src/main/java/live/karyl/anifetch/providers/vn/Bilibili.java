@@ -15,11 +15,13 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.tinylog.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 public class Bilibili extends AnimeProvider {
@@ -82,12 +84,12 @@ public class Bilibili extends AnimeProvider {
 	}
 
 	@Override
-	public AnimeSource getLink(String value) {
+	public AnimeSource getLink(String value, boolean ignoreCache) {
 		try {
 			AnimeSource animeSource = new AnimeSource(siteName);
 			String redisId = siteName + "$" + value;
 
-			if (redis.exists(redisId, REDIS_SOURCE)) {
+			if (redis.exists(redisId, REDIS_SOURCE) && !ignoreCache) {
 				animeSource = new Gson().fromJson(redis.get(redisId, REDIS_SOURCE), AnimeSource.class);
 				if (animeSource != null) return animeSource;
 			}
@@ -213,9 +215,8 @@ public class Bilibili extends AnimeProvider {
 			animeSource.addHeader("referer", "https://www.bilibili.tv/en/play/" + mediaId);
 
 			redis.set(redisId, animeSource.toJson(), REDIS_SOURCE);
-
+			checkVideoStream(videoResources, value);
 			return animeSource;
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -241,7 +242,7 @@ public class Bilibili extends AnimeProvider {
 
 	private boolean compareResult(AnilistInfo anilistInfo, Document mainPage, String type) {
 		if (mainPage == null) {
-			System.out.println("Main page is null");
+			Logger.error("Bilibili | Main page is null");
 			return false;
 		}
 		var year = Integer.parseInt(mainPage.select(".bstar-meta__create-time").text().split(",")[1].trim());
@@ -269,5 +270,20 @@ public class Bilibili extends AnimeProvider {
 				&& Utils.checkNumberEqual(episode, anilistInfo.getCurrentEpisode())
 				&& Utils.matchedRate(title, anilistInfo.getTitle().romaji) > 0.5;
 
+	}
+
+	private void checkVideoStream(List<VideoResource> videoResources, String value) {
+		CompletableFuture.runAsync(() -> {
+			var isAllCanAccess = true;
+			for (var videoUrl : videoResources) {
+				var canAccess = Utils.checkURLBilibili(videoUrl.getUrl());
+				if (!canAccess) {
+					getLink(value, false);
+					isAllCanAccess = false;
+					break;
+				}
+			}
+			Logger.info("All video stream can access: " + isAllCanAccess);
+		});
 	}
 }
