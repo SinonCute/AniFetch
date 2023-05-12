@@ -93,10 +93,10 @@ public class AnimeTVN extends AnimeProvider {
 			AnimeSource animeSource = new AnimeSource(siteName);
 			String redisId = siteName + "$" + value;
 
-			if (redis.exists(redisId, REDIS_SOURCE) && !ignoreCache) {
-				String jsonData = redis.get(redisId, REDIS_SOURCE);
-				return new Gson().fromJson(jsonData, AnimeSource.class);
-			}
+//			if (redis.exists(redisId, REDIS_SOURCE) && !ignoreCache) {
+//				String jsonData = redis.get(redisId, REDIS_SOURCE);
+//				return new Gson().fromJson(jsonData, AnimeSource.class);
+//			}
 
 			JSONParser jsonParser = new JSONParser();
 			JSONObject links = (JSONObject) jsonParser.parse(requestPostGetLink(value, true));
@@ -197,16 +197,17 @@ public class AnimeTVN extends AnimeProvider {
 	}
 
 	public String playHQB(String fileID) {
+		System.out.println(fileID);
 		try {
 			String url = "https://api-plhq.playhbq.xyz/apiv4/" + ANIME_TVN_USER_ID + "/" + fileID;
 			RequestBody requestBody = new FormBody.Builder()
-					.addEncoded("referrer", baseUrl)
+					.addEncoded("referrer", "https://animetvn.in")
 					.addEncoded("typeend", "html")
 					.build();
 			Request request = new Request.Builder()
 					.url(url)
-					.addHeader("origin", "https://play.playhbq.xyz")
-					.addHeader("referer", "https://play.playhbq.xyz/")
+					.addHeader("Origin", "https://play.playhbq.xyz")
+					.addHeader("Referer", "https://play.playhbq.xyz/")
 					.post(requestBody)
 					.build();
 			Response response = connection.callWithoutRateLimit(request);
@@ -214,6 +215,7 @@ public class AnimeTVN extends AnimeProvider {
 				throw new RuntimeException("Request failed");
 			}
 			JSONObject jsonData = (JSONObject) new JSONParser().parse(response.body().string());
+			System.out.println(jsonData);
 			var link = jsonData.get("data").toString();
 			response.close();
 			return link;
