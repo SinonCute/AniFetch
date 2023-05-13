@@ -21,6 +21,7 @@ public class ConfigManager {
 	private int databaseTimeout;
 
 	private String redisHost;
+	private String redisPassword;
 	private int redisPort;
 	private int redisPoolSizeMax;
 	private int redisPoolSizeMin;
@@ -69,6 +70,7 @@ public class ConfigManager {
 
 		redisHost = yaml.getString("redis.host");
 		redisPort = yaml.getInt("redis.port");
+		redisPassword = yaml.getString("redis.password");
 		redisPoolSizeMax = yaml.getInt("redis.pool.max");
 		redisPoolSizeMin = yaml.getInt("redis.pool.min");
 		redisPoolSizeIdle = yaml.getInt("redis.pool.idle");
@@ -110,6 +112,8 @@ public class ConfigManager {
 	public String getRedisHost() {
 		return redisHost;
 	}
+
+	public String getRedisPassword() { return redisPassword; }
 
 	public int getRedisPort() {
 		return redisPort;

@@ -20,6 +20,7 @@ public class Redis {
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
 		var host = config.getRedisHost();
 		var port = config.getRedisPort();
+		var pass = config.getRedisPassword();
 		var poolMax = config.getRedisPoolSizeMax();
 		var poolMin = config.getRedisPoolSizeMin();
 		var poolIdle = config.getRedisPoolSizeIdle();
@@ -27,7 +28,7 @@ public class Redis {
 		poolConfig.setMaxIdle(poolIdle);
 		poolConfig.setMinIdle(poolMin);
 
-		jedisPool = new JedisPool(poolConfig, host, port);
+		jedisPool = new JedisPool(poolConfig, host, port, 5000, pass);
 
 		if (!jedisPool.getResource().ping().equals("PONG")) {
 			Logger.error("Redis is not connected");
