@@ -24,7 +24,7 @@ public class Utils {
 
     public static AnilistInfo fetchAnilist(String id) {
         try {
-            String url = "https://api.karyl.live/consumet/meta/anilist/info/" + id;
+            String url = config.getAniListUrl() + "/meta/anilist/info/" + id;
             Request request = new Request.Builder()
                     .url(url)
                     .build();

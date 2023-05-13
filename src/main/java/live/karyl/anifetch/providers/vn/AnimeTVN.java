@@ -119,7 +119,7 @@ public class AnimeTVN extends AnimeProvider {
 						String fileID = path.substring(path.lastIndexOf("/") + 1);
 						var url = playHQB(fileID);
 						if (url != null) {
-							var videoResource = new VideoResource(url, "720P", id, VideoType.HLS);
+							var videoResource = new VideoResource(url, "720P", "FB", VideoType.HLS);
 							animeSource.addVideoResource(videoResource);
 						}
 					}
@@ -129,7 +129,7 @@ public class AnimeTVN extends AnimeProvider {
 						Pattern pattern = Pattern.compile(patternString);
 						Matcher matcher = pattern.matcher(document.html());
 						if (matcher.find()) {
-							var videoResource = new VideoResource(matcher.group(), "720P", id, VideoType.MP4);
+							var videoResource = new VideoResource(matcher.group(), "720P", "TVN", VideoType.MP4);
 							animeSource.addVideoResource(videoResource);
 						}
 					}

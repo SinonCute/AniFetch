@@ -1,6 +1,5 @@
 package live.karyl.anifetch;
 
-import jakarta.servlet.http.HttpServletRequest;
 import live.karyl.anifetch.utils.DashPlayerCreator;
 import live.karyl.anifetch.utils.JSONToVTTConverter;
 import okhttp3.Request;
@@ -8,6 +7,7 @@ import okhttp3.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
@@ -15,6 +15,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
 @Controller
+@RequestMapping("/v2/api")
 public class RestService {
 
     @GetMapping("/stream-bilibili")

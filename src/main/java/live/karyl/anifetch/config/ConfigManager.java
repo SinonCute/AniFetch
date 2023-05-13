@@ -32,6 +32,9 @@ public class ConfigManager {
 	private boolean isDebug;
 	private int okHttpRetry;
 	private String proxyVN;
+	private String proxyVNBackup;
+
+	private String aniListUrl;
 	private String userAgent;
 
 	private String bilibiliCookie;
@@ -80,6 +83,8 @@ public class ConfigManager {
 		isDebug = yaml.getBoolean("general.debug");
 		okHttpRetry = yaml.getInt("general.okHttpRetry");
 		proxyVN = yaml.getString("general.proxyVN");
+		proxyVNBackup = yaml.getString("general.proxyVNBackup");
+		aniListUrl = yaml.getString("general.aniListUrl");
 		userAgent = yaml.getString("general.userAgent");
 
 		bilibiliCookie = yaml.getString("bilibili.cookie");
@@ -146,6 +151,10 @@ public class ConfigManager {
 	public String getProxyVN() {
 		return proxyVN;
 	}
+
+	public String getProxyVNBackup() { return proxyVNBackup; }
+
+	public String getAniListUrl() { return aniListUrl; }
 
 	public String getUserAgent() {
 		return userAgent;

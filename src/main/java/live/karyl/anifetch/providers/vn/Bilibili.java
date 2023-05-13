@@ -112,12 +112,12 @@ public class Bilibili extends AnimeProvider {
 					.build();
 
 			Request request = new Request.Builder()
-					.url(PROXY_VN)
+					.url(config.getProxyVNBackup())
 					.post(requestResource)
 					.build();
 
 			Request subtileRequest = new Request.Builder()
-					.url(PROXY_VN)
+					.url(config.getProxyVNBackup())
 					.post(requestSubtile)
 					.build();
 

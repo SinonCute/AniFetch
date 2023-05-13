@@ -51,7 +51,7 @@ public abstract class AnimeProvider {
 
 	protected Document connect(String url, String siteName) {
 		switch (siteName) {
-			case "AnimeHay", "AnimeVietsub", "Bilibili" -> {
+			case "AnimeHay", "AnimeVietsub" -> {
 				try {
 					RequestBody requestBody = new FormBody.Builder()
 							.addEncoded("url", url)
@@ -60,6 +60,24 @@ public abstract class AnimeProvider {
 							.build();
 					Request request = new Request.Builder()
 							.url(PROXY_VN)
+							.post(requestBody)
+							.build();
+					Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
+					return Jsoup.parse(new String(response.body().bytes(), StandardCharsets.UTF_8));
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+			case "Bilibili" -> {
+				try {
+					RequestBody requestBody = new FormBody.Builder()
+							.addEncoded("url", url)
+							.addEncoded("method", "GET")
+							.addEncoded("header-user-agent", USER_AGENT)
+							.build();
+					Request request = new Request.Builder()
+							.url(config.getProxyVNBackup())
 							.post(requestBody)
 							.build();
 					Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
