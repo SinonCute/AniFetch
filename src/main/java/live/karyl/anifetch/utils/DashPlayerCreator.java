@@ -109,9 +109,12 @@ public class DashPlayerCreator {
             // Write each audio segment template
             for (var source : animeSource.getAudioResources()) {
 
-                String headers = new Gson().toJson(animeSource.getHeaders());
-                String audioUrl = PROXY_URL + new URLEncoder().encode(source.getUrl(), StandardCharsets.UTF_8)
-                        +  "&header=" + headers + "&replace=true";
+                String audioUrl = source.getUrl();
+                if (!source.getUrl().contains("-bstar1-")) {
+                    String headers = new Gson().toJson(animeSource.getHeaders());
+                    audioUrl = PROXY_URL + new URLEncoder().encode(source.getUrl(), StandardCharsets.UTF_8)
+                            +  "&header=" + headers + "&replace=true";
+                }
 
                 xmlWriter.writeStartElement("Representation");
                 xmlWriter.writeAttribute("id", String.valueOf(representation));
