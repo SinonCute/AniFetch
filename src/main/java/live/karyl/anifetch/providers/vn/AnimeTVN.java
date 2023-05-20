@@ -1,6 +1,8 @@
 package live.karyl.anifetch.providers.vn;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import live.karyl.anifetch.models.*;
 import live.karyl.anifetch.providers.AnimeProvider;
 import live.karyl.anifetch.types.AudioType;
@@ -12,7 +14,6 @@ import okhttp3.FormBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.jsoup.Jsoup;
@@ -98,20 +99,24 @@ public class AnimeTVN extends AnimeProvider {
 				return new Gson().fromJson(jsonData, AnimeSource.class);
 			}
 
-			JSONParser jsonParser = new JSONParser();
-			JSONObject links = (JSONObject) jsonParser.parse(requestPostGetLink(value, true));
-			JSONArray linksArray = (JSONArray) links.get("links");
+			String listServer = requestPostGetLink(value, true);
+			JsonObject links = new Gson().fromJson(listServer, JsonObject.class);
+			JsonArray servers = links.get("links").getAsJsonArray();
 
+			for (var server : servers) {
+				JsonObject serverValue = server.getAsJsonObject();
+				String id = serverValue.get("id").getAsString();
+				String epLink = serverValue.get("link").getAsString();
 
-			for (var object : linksArray) {
-				JSONObject linksValue = (JSONObject) object;
-				String id = linksValue.get("id").toString();
-				String epLink = linksValue.get("link").toString();
+				if (!(id.equals("13") || id.equals("20"))) {
+					continue;
+				}
+
 				String params = "{0},{1}"
 						.replace("{0}", id)
 						.replace("{1}", URLEncoder.encode(epLink, StandardCharsets.UTF_8));
 				String linkPlayer = requestPostGetLink(params, false);
-				String data = (String) ((JSONObject) jsonParser.parse(linkPlayer)).get("link");
+				String data = new Gson().fromJson(linkPlayer, JsonObject.class).get("link").getAsString();
 				switch (id) {
 					case "20" -> {
 						URI uri = new URI(data);
@@ -119,7 +124,7 @@ public class AnimeTVN extends AnimeProvider {
 						String fileID = path.substring(path.lastIndexOf("/") + 1);
 						var url = playHQB(fileID);
 						if (url != null) {
-							var videoResource = new VideoResource(url, "720P", "FB", VideoType.HLS);
+							var videoResource = new VideoResource(url, "720P", "TVN", VideoType.HLS);
 							animeSource.addVideoResource(videoResource);
 						}
 					}
@@ -129,7 +134,7 @@ public class AnimeTVN extends AnimeProvider {
 						Pattern pattern = Pattern.compile(patternString);
 						Matcher matcher = pattern.matcher(document.html());
 						if (matcher.find()) {
-							var videoResource = new VideoResource(matcher.group(), "720P", "TVN", VideoType.MP4);
+							var videoResource = new VideoResource(matcher.group(), "720P", "FB", VideoType.MP4);
 							animeSource.addVideoResource(videoResource);
 						}
 					}

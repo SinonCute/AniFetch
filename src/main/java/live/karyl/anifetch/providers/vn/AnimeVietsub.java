@@ -141,7 +141,9 @@ public class AnimeVietsub extends AnimeProvider {
 						videoResource.setUseHeader(false);
 						animeSource.addVideoResource(videoResource);
 					}
-				} catch (IOException ignored) {}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			});
 			animeSource.setSubtitleType(SubtitleType.HARD);
 			animeSource.setAudioType(AudioType.HARD);
