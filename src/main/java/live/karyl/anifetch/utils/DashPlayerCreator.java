@@ -66,7 +66,7 @@ public class DashPlayerCreator {
                 } else if (source.isUseHeader() && !source.getUrl().contains("-bstar1-")) {
                     String headers = new Gson().toJson(animeSource.getHeaders());
                     videoUrl = PROXY_URL + new URLEncoder().encode(source.getUrl() ,StandardCharsets.UTF_8)
-                            +  "&header=" + headers + "&replace=true";
+                            +  "&headers=" + headers + "&replace=true";
                 }
 
                 xmlWriter.writeStartElement("Representation");
@@ -113,7 +113,7 @@ public class DashPlayerCreator {
                 if (!source.getUrl().contains("-bstar1-")) {
                     String headers = new Gson().toJson(animeSource.getHeaders());
                     audioUrl = PROXY_URL + new URLEncoder().encode(source.getUrl(), StandardCharsets.UTF_8)
-                            +  "&header=" + headers + "&replace=true";
+                            +  "&headers=" + headers + "&replace=true";
                 }
 
                 xmlWriter.writeStartElement("Representation");

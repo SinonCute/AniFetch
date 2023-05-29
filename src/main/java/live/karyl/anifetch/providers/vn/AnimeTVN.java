@@ -22,6 +22,7 @@ import org.jsoup.nodes.Document;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,11 +31,13 @@ public class AnimeTVN extends AnimeProvider {
 
 	private static final String ANIME_TVN_USER_ID = "61211fa59c0163458e94b0c0";
 	private final String[] token;
+	private long tokenLifeTime;
 
 
 	public AnimeTVN() {
 		super("AnimeTVN", "ATVN","https://animetvn.in/");
 		token = new String[2];
+		tokenLifeTime = System.currentTimeMillis() + Duration.ofHours(12).toMillis();
 		requestToken();
 	}
 
@@ -130,6 +133,7 @@ public class AnimeTVN extends AnimeProvider {
 					}
 					case "13" -> {
 						var document = connect(data, siteName);
+						if (document == null) continue;
 						String patternString = "https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
 						Pattern pattern = Pattern.compile(patternString);
 						Matcher matcher = pattern.matcher(document.html());
@@ -202,7 +206,6 @@ public class AnimeTVN extends AnimeProvider {
 	}
 
 	public String playHQB(String fileID) {
-		System.out.println(fileID);
 		try {
 			String url = "https://api-plhq.playhbq.xyz/apiv4/" + ANIME_TVN_USER_ID + "/" + fileID;
 			RequestBody requestBody = new FormBody.Builder()
@@ -233,6 +236,7 @@ public class AnimeTVN extends AnimeProvider {
 		try {
 			String url;
 			FormBody req;
+			checkToken();
 			if (multiServer) {
 				url = baseUrl + "ajax/getExtraLinks";
 				req = new FormBody.Builder()
@@ -259,6 +263,13 @@ public class AnimeTVN extends AnimeProvider {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}
+	}
+
+	private void checkToken() {
+		if (tokenLifeTime < System.currentTimeMillis()) {
+			requestToken();
+			tokenLifeTime = System.currentTimeMillis() + Duration.ofHours(12).toMillis();
 		}
 	}
 
