@@ -6,6 +6,7 @@ import live.karyl.anifetch.utils.Utils;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StopWatch;
 import org.tinylog.Logger;
 
 import java.util.concurrent.CompletableFuture;
@@ -27,7 +28,7 @@ public class GraphqlService {
 						return new Results(animeParsers.size(), true, animeParsers);
 					}
 				});
-		return future.orTimeout(25, TimeUnit.SECONDS).exceptionally(e -> {
+		return future.orTimeout(30, TimeUnit.SECONDS).exceptionally(e -> {
 			Logger.debug("Timeout on " + id);
 			return new Results(0, false, null);
 		});

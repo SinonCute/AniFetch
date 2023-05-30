@@ -195,6 +195,7 @@ public class AnimeTVN extends AnimeProvider {
 				year = Integer.parseInt(yearMatcher.group(1).split(" ")[1]);
 			}
 		}
+
 		if (type.equals("english")) {
 			return year == anilistInfo.getReleaseDate()
 					&& Utils.checkNumberEqual(episode, anilistInfo.getCurrentEpisode())

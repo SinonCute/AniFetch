@@ -17,6 +17,7 @@ public class WebSecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf().disable()
 				.authorizeHttpRequests()
+				.requestMatchers(HttpMethod.OPTIONS, "/graphql").permitAll()
 				.requestMatchers(HttpMethod.POST, "/graphql").permitAll()
 				.requestMatchers( HttpMethod.GET,"/v2/api/**").permitAll()
 				.anyRequest().authenticated();
