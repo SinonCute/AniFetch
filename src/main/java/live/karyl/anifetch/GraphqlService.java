@@ -29,6 +29,7 @@ public class GraphqlService {
 					}
 				});
 		return future.orTimeout(30, TimeUnit.SECONDS).exceptionally(e -> {
+			Logger.error(e);
 			Logger.debug("Timeout on " + id);
 			return new Results(0, false, null);
 		});

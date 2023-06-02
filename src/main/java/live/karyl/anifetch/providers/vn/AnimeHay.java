@@ -156,6 +156,7 @@ public class AnimeHay extends AnimeProvider {
 			var element = episodeElement.get(i);
 			var id = element.attr("href").replaceAll("^.*-(\\d+)\\.html$", "$1");
 			var number = extractNumberFromString(element.text());
+			if (number == -1) continue;
 			episodes.add(new AnimeEpisode(element.text(), number, id));
 		}
 		return episodes;

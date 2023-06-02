@@ -165,6 +165,7 @@ public class AnimeVietsub extends AnimeProvider {
 			var episodeId = element.attr("data-id");
 			var labelEpisode = element.text();
 			var number = extractNumberFromString(labelEpisode);
+			if (number == -1) return;
 			episodes.add(new AnimeEpisode(labelEpisode, number, id + "$" + episodeId));
 		});
 		return episodes;

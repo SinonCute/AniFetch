@@ -234,6 +234,7 @@ public class Bilibili extends AnimeProvider {
 			var pattern = Pattern.compile("/play/([0-9]+)/([0-9]+)\\?.*");
 			var matcher = pattern.matcher(episodeId);
 			if (!matcher.find()) continue;
+			if (episodeNumber == -1) continue;
 			episodes.add(new AnimeEpisode(episodeTitle, episodeNumber, matcher.group(1) + "$" + matcher.group(2)));
 		}
 
