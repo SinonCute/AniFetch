@@ -26,7 +26,7 @@ public class AnimeHay extends AnimeProvider {
 	private static final String PLAYER_API = "https://suckplayer.xyz/player/index.php?data=%s&do=getVideo";
 
 	public AnimeHay() {
-		super("AnimeHay", "AH","https://animehay.fan/");
+		super("AnimeHay", "AH","https://animehay.io/");
 	}
 
 	@Override

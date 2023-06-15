@@ -24,7 +24,7 @@ public class SearchRequest {
 
 			if (key == null) return new String[0];
 
-			String searchURL = "https://animetvn.in/tim-kiem-nang-cao.html?" +
+			String searchURL = "https://animetvn.live/tim-kiem-nang-cao.html?" +
 					"q=" + URLEncoder.encode(key, StandardCharsets.UTF_8) +
 					"&nam=" + year;
 			Request request = new Request.Builder()
@@ -47,7 +47,7 @@ public class SearchRequest {
 						.addEncoded("key", key)
 						.build();
 				request = new Request.Builder()
-						.url("https://animetvn.in/ajax/search")
+						.url("https://animetvn.live/ajax/search")
 						.addHeader("x-csrf-token", token[0])
 						.addHeader("Cookie", token[1])
 						.addHeader("x-requested-with", "XMLHttpRequest")
@@ -99,7 +99,7 @@ public class SearchRequest {
 		try {
 			if (key == null) return new String[0];
 			String keyEncoded = URLEncoder.encode(key.replaceAll(" ", "-"), StandardCharsets.UTF_8);
-			String searchURL = "https://animehay.fan/tim-kiem/" + keyEncoded + ".html";
+			String searchURL = "https://animehay.io/tim-kiem/" + keyEncoded + ".html";
 			RequestBody requestBody = new FormBody.Builder()
 					.addEncoded("url", searchURL)
 					.addEncoded("method", "GET")
@@ -127,7 +127,7 @@ public class SearchRequest {
 
 	public static String[] animeVietsub(String key) {
 		try {
-			String searchURL = "https://animevietsub.im/ajax/suggest";
+			String searchURL = "https://animevietsub.moe/ajax/suggest";
 
 			if (key == null) return new String[0];
 

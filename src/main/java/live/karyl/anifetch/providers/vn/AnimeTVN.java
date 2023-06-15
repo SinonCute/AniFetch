@@ -35,7 +35,7 @@ public class AnimeTVN extends AnimeProvider {
 
 
 	public AnimeTVN() {
-		super("AnimeTVN", "ATVN","https://animetvn.in/");
+		super("AnimeTVN", "ATVN","https://animetvn.live/");
 		token = new String[2];
 		tokenLifeTime = System.currentTimeMillis() + Duration.ofHours(12).toMillis();
 		requestToken();
@@ -209,9 +209,10 @@ public class AnimeTVN extends AnimeProvider {
 
 	public String playHQB(String fileID) {
 		try {
+			System.out.println();
 			String url = "https://api-plhq.playhbq.xyz/apiv4/" + ANIME_TVN_USER_ID + "/" + fileID;
 			RequestBody requestBody = new FormBody.Builder()
-					.addEncoded("referrer", "https://animetvn.in")
+					.addEncoded("referrer", baseUrl.substring(0, baseUrl.length() - 1))
 					.addEncoded("typeend", "html")
 					.build();
 			Request request = new Request.Builder()

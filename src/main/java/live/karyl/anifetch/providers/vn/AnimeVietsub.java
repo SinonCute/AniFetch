@@ -24,7 +24,7 @@ import java.util.Map;
 public class AnimeVietsub extends AnimeProvider {
 
 	public AnimeVietsub() {
-		super("AnimeVietsub", "AVS","https://animevietsub.im/");
+		super("AnimeVietsub", "AVS","https://animevietsub.moe/");
 	}
 
 	@Override
@@ -132,8 +132,8 @@ public class AnimeVietsub extends AnimeProvider {
 						var link = file.replace("//", "https://");
 						var videoResource = new VideoResource(link, "720P", "DU", VideoType.HLS);
 						videoResource.setUseHeader(true);
-						animeSource.addHeader("Origin", "https://animevietsub.im/");
-						animeSource.addHeader("Referer", "https://animevietsub.im/");
+						animeSource.addHeader("Origin", baseUrl);
+						animeSource.addHeader("Referer", baseUrl);
 						animeSource.addVideoResource(videoResource);
 					}
 					if (file.contains("fbcdn.net")) {
