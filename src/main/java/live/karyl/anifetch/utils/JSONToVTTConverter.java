@@ -33,11 +33,14 @@ public class JSONToVTTConverter {
 
 
     private static LocalTime convertToTime(double seconds) {
-        int minutes = (int) (seconds / 60);
-        int hours = minutes / 60;
-        int secondsInt = (int) seconds % 60;
-        int milliseconds = (int) ((seconds - secondsInt) * 1000);
-        return LocalTime.of(hours, minutes, secondsInt, milliseconds);
+        int milliseconds = (int) ((seconds - (long) seconds) * 1000);
+
+        long totalMillis = (long) (seconds * 1000);
+        int hours = (int) (totalMillis / 3600000);
+        int minutes = (int) ((totalMillis % 3600000) / 60000);
+        int remainingSeconds = (int) ((totalMillis % 60000) / 1000);
+
+        return LocalTime.of(hours, minutes, remainingSeconds, milliseconds * 1_000_000);
     }
 
     private static String formatTime(LocalTime time) {
