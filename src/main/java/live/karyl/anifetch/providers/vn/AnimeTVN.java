@@ -128,6 +128,7 @@ public class AnimeTVN extends AnimeProvider {
 						var url = playHQB(fileID);
 						if (url != null) {
 							var videoResource = new VideoResource(url, "720P", "TVN", VideoType.HLS);
+							videoResource.setUseHeader(true);
 							animeSource.addVideoResource(videoResource);
 						}
 					}

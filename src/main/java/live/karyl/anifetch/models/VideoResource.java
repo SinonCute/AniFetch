@@ -28,6 +28,7 @@ public class VideoResource {
 		this.quality = quality;
 		this.serverId = serverId;
 		this.videoType = videoType;
+		this.useHeader = false;
 	}
 
 	public void setDuration(int duration) {

@@ -84,8 +84,8 @@ public class WebLinhTinh extends AnimeProvider {
         for (var a : document.select("span.halim-btn")) {
             String episode = a.attr("data-episode");
             String server = a.attr("data-server");
-            String postid = a.attr("data-post-id");
-            episodes.add(new AnimeEpisode(episode, Integer.parseInt(episode), episode + "$" + server + "$" + postid));
+            String postId = a.attr("data-post-id");
+            episodes.add(new AnimeEpisode(episode, Integer.parseInt(episode), episode + "$" + server + "$" + postId));
         }
         return episodes;
     }
@@ -115,8 +115,11 @@ public class WebLinhTinh extends AnimeProvider {
 
             for (var a : sourcesArray) {
                 var sourceObject = a.getAsJsonObject();
-                String link = sourceObject.get("file").getAsString();
-                var videoResource = new VideoResource(link, "720P", value[1], VideoType.HLS);
+                var url = sourceObject.get("file").getAsString();
+                var currentServer = url.contains("s2") ? "s2" : "s1";
+                var backupUrl = url.replace(currentServer, currentServer.equals("s2") ? "s1" : "s2");
+                var videoResource = new VideoResource(url, "720P", value[1], VideoType.HLS);
+                videoResource.setBackupUrl(backupUrl);
                 animeSource.addVideoResource(videoResource);
             }
         }

@@ -31,6 +31,8 @@ public abstract class AnimeProvider {
     protected final String REDIS_SOURCE = "source";
     protected final String REDIS_NON_EXIST = "non_exist";
 
+    protected final String ANIFY_API_KEY = "67a51de430d3fd64a9b5f6b8a77a3558";
+
 
     protected final OkHttp connection = AniFetchApplication.getConnection();
     protected final Redis redis = AniFetchApplication.getRedis();
@@ -123,4 +125,6 @@ public abstract class AnimeProvider {
     public String getSiteId() {
         return siteId;
     }
+
+    public String getAnifyApiKey() { return  ANIFY_API_KEY; }
 }

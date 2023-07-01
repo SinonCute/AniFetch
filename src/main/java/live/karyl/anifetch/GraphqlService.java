@@ -6,9 +6,10 @@ import live.karyl.anifetch.utils.Utils;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StopWatch;
 import org.tinylog.Logger;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -39,9 +40,10 @@ public class GraphqlService {
 	public AnimeSource source(@Argument String providerId, @Argument String value) {
 		Logger.debug("Getting source for " + providerId + " " + value);
 		var providers = AniFetchApplication.getProviders().values();
+		var valueDecoded = URLDecoder.decode(value, StandardCharsets.UTF_8);
 		for (var provider : providers) {
 			if (provider.getSiteId().equals(providerId)) {
-				return provider.getLink(value, false);
+				return provider.getLink(valueDecoded, false);
 			}
 		}
 		return null;

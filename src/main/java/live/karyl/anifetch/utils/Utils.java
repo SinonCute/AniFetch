@@ -87,11 +87,12 @@ public class Utils {
         for (var provider : AniFetchApplication.getProviders().values()) {
             CompletableFuture<AnimeParser> future = CompletableFuture.supplyAsync(() -> provider.search(anilistInfo))
                     .thenApply(animeParser -> {
-                        if (animeParser == null || animeParser.getEpisodes() == null) {
+                        if (animeParser == null || animeParser.getEpisodes() == null || animeParser.getEpisodes().isEmpty()) {
                             return null;
                         }
                         return animeParser;
                     });
+            if (future == null) continue;
             futures.add(future);
         }
 
