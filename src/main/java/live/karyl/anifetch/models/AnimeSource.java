@@ -85,10 +85,14 @@ public class AnimeSource {
 			return;
 		}
 		for (Header h : headers) {
-			if (h.key().equals(key)) {
-				h.value().add(value);
+			if (h.key().equals(key) && !h.value().contains(value)) {
+				var values = new ArrayList<>(h.value());
+				values.add(value);
+				headers.remove(h);
+				headers.add(new Header(key, values));
 				return;
 			}
+			return;
 		}
 		headers.add(new Header(key, List.of(value)));
 	}

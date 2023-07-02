@@ -6,6 +6,7 @@ import live.karyl.anifetch.database.PostgreSQL;
 import live.karyl.anifetch.database.Redis;
 import live.karyl.anifetch.providers.AnimeProvider;
 import live.karyl.anifetch.providers.eng.Gogoanime;
+import live.karyl.anifetch.providers.eng.NineAnime;
 import live.karyl.anifetch.providers.vn.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -53,6 +54,7 @@ public class AniFetchApplication {
 		providers.put("AnimeHay", new AnimeHay());
 		providers.put("AnimeVietsub", new AnimeVietsub());
 		providers.put("GogoAnime", new Gogoanime());
+		providers.put("9anime", new NineAnime());
 	}
 
 	public static File getDataFolder() {

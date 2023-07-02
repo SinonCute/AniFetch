@@ -119,6 +119,9 @@ public class WebLinhTinh extends AnimeProvider {
                 var currentServer = url.contains("s2") ? "s2" : "s1";
                 var backupUrl = url.replace(currentServer, currentServer.equals("s2") ? "s1" : "s2");
                 var videoResource = new VideoResource(url, "720P", value[1], VideoType.HLS);
+                videoResource.setUseHeader(true);
+                animeSource.addHeader("Origin", baseUrl);
+                animeSource.addHeader("Referer", baseUrl);
                 videoResource.setBackupUrl(backupUrl);
                 animeSource.addVideoResource(videoResource);
             }
