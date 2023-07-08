@@ -99,7 +99,8 @@ public class Gogoanime extends AnimeProvider {
             redis.set(redisId, animeSource.toJson(), REDIS_SOURCE);
             return animeSource;
         } catch (Exception e) {
-            Logger.error("[%s] Error while parsing sources: ".formatted(siteId) + e.getMessage());
+            Logger.error("[%s] Error while parsing sources: ".formatted(siteId) + e.getMessage()
+                    + "Anime ID: " + animeId + " Episode ID: " + episodeId + " Episode Number: " + episodeNumber);
         }
         return null;
     }

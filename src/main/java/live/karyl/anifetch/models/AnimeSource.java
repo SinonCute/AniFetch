@@ -80,21 +80,31 @@ public class AnimeSource {
 	}
 
 	public void addHeader(String key, String value) {
+		List<Header> modifiedHeaders = new ArrayList<>();
+
 		if (headers.isEmpty()) {
-			headers.add(new Header(key, List.of(value)));
-			return;
-		}
-		for (Header h : headers) {
-			if (h.key().equals(key) && !h.value().contains(value)) {
-				var values = new ArrayList<>(h.value());
-				values.add(value);
-				headers.remove(h);
-				headers.add(new Header(key, values));
-				return;
+			modifiedHeaders.add(new Header(key, List.of(value)));
+		} else {
+			boolean headerUpdated = false;
+			for (Header h : headers) {
+				if (h.key().equals(key) && !h.value().contains(value)) {
+					List<String> values = new ArrayList<>(h.value());
+					values.add(value);
+					modifiedHeaders.add(new Header(key, values));
+					headerUpdated = true;
+				} else if (h.key().equals(key) && h.value().contains(value)){
+					return;
+				} else {
+					modifiedHeaders.add(h);
+				}
 			}
-			return;
+			if (!headerUpdated) {
+				modifiedHeaders.add(new Header(key, List.of(value)));
+			}
 		}
-		headers.add(new Header(key, List.of(value)));
+
+		headers.clear();
+		headers.addAll(modifiedHeaders);
 	}
 
 	public List<Header> getHeaders() {

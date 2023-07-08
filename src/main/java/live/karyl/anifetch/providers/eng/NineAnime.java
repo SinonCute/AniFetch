@@ -88,7 +88,7 @@ public class NineAnime extends AnimeProvider {
                 var sourceUrl = sourceObject.get("url").getAsString();
                 var sourceQuality = sourceObject.get("quality").getAsString();
                 var videoSource = new VideoResource(sourceUrl, sourceQuality, "default", VideoType.HLS);
-//                videoSource.setUseHeader(true);
+                videoSource.setUseHeader(true);
                 animeSource.addHeader("Referer", "https://9anime.to");
                 animeSource.addVideoResource(videoSource);
             }

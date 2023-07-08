@@ -63,7 +63,7 @@ public class DashPlayerCreator {
 
                 if (quality.equals("4k")) {
                     videoUrl = source.getUrl();
-                } else if (source.isUseHeader() && !source.getUrl().contains("-bstar1-")) {
+                } else if (source.isUseHeader()) {
                     String headers = new Gson().toJson(animeSource.getHeaders());
                     videoUrl = PROXY_URL + new URLEncoder().encode(source.getUrl() ,StandardCharsets.UTF_8)
                             +  "&headers=" + headers + "&replace=true";
@@ -109,12 +109,9 @@ public class DashPlayerCreator {
             // Write each audio segment template
             for (var source : animeSource.getAudioResources()) {
 
-                String audioUrl = source.getUrl();
-                if (!source.getUrl().contains("-bstar1-")) {
-                    String headers = new Gson().toJson(animeSource.getHeaders());
-                    audioUrl = PROXY_URL + new URLEncoder().encode(source.getUrl(), StandardCharsets.UTF_8)
+                String headers = new Gson().toJson(animeSource.getHeaders());
+                String audioUrl = PROXY_URL + new URLEncoder().encode(source.getUrl(), StandardCharsets.UTF_8)
                             +  "&headers=" + headers + "&replace=true";
-                }
 
                 xmlWriter.writeStartElement("Representation");
                 xmlWriter.writeAttribute("id", String.valueOf(representation));

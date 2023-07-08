@@ -212,7 +212,8 @@ public class Bilibili extends AnimeProvider {
 			animeSource.setAudioType(AudioType.SOFT);
 			animeSource.setSubtitleType(SubtitleType.SOFT);
 
-			animeSource.addHeader("referer", "https://www.bilibili.tv/en/play/" + mediaId);
+			animeSource.addHeader("Origin", "https://www.bilibili.tv/");
+			animeSource.addHeader("Referer", "https://www.bilibili.tv/");
 
 			redis.set(redisId, animeSource.toJson(), REDIS_SOURCE);
 			checkVideoStream(videoResources, value);

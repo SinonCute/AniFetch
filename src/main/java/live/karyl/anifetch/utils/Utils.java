@@ -55,6 +55,7 @@ public class Utils {
                         .get();
                 break;
             } catch (Exception e) {
+                e.printStackTrace();
                 Logger.debug(retry + " Retry connect to " + url);
                 retry--;
             }
