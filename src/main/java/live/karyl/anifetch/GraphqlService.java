@@ -19,7 +19,7 @@ public class GraphqlService {
 	@QueryMapping("animeSearch")
 	public CompletableFuture<Results> animeSearch(@Argument String id) {
 		Logger.debug("Searching for " + id);
-		CompletableFuture<Results> future = Utils.searchAllAsync(id)
+		CompletableFuture<Results> future = Utils.searchAllAsyncTimer(id)
 				.thenApplyAsync(animeParsers -> {
 					if (animeParsers.isEmpty()) {
 						Logger.debug("No results found on" + id);

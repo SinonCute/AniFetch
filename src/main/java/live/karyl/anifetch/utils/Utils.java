@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class Utils {
@@ -103,6 +104,44 @@ public class Utils {
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList()));
     }
+
+    public static CompletableFuture<List<AnimeParser>> searchAllAsyncTimer(String id) {
+        AnilistInfo anilistInfo = fetchAnilist(id);
+        List<CompletableFuture<AnimeParser>> futures = new ArrayList<>();
+
+        for (var provider : AniFetchApplication.getProviders().values()) {
+            CompletableFuture<AnimeParser> future = CompletableFuture.supplyAsync(() -> {
+                // Start stopwatch
+                long startTime = System.nanoTime();
+
+                AnimeParser result = provider.search(anilistInfo);
+
+                // Stop stopwatch and calculate duration
+                long endTime = System.nanoTime();
+                long duration = TimeUnit.NANOSECONDS.toMillis(endTime - startTime);
+
+                // Print the duration for the provider's search operation
+                Logger.debug("Provider: " + provider.getSiteName()+ ", Duration: " + duration + "ms");
+
+                return result;
+            }).thenApply(animeParser -> {
+                if (animeParser == null || animeParser.getEpisodes() == null || animeParser.getEpisodes().isEmpty()) {
+                    return null;
+                }
+                return animeParser;
+            });
+
+            if (future == null) continue;
+            futures.add(future);
+        }
+
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> futures.stream()
+                        .map(CompletableFuture::join)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList()));
+    }
+
 
     public static boolean checkNumberEqual(int int1, int int2) {
         return Math.abs(int1 - int2) <= 1;

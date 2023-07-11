@@ -23,29 +23,12 @@ public class OkHttp {
         client = builder.build();
     }
 
-    public Response call(Request request) {
-        var retry = config.getOkHttpRetry();
-        while (retry > 0) {
-            try {
-                return client.newCall(request).execute();
-            } catch (Exception e) {
-                Logger.debug("Retry: " + retry + " " + request.url());
-                retry--;
-            }
-        }
-        return null;
-    }
-
     public Response callWithoutRateLimit(Request request) {
-        var retry = config.getOkHttpRetry();
-        while (retry > 0) {
-            try {
-                return client.newCall(request).execute();
-            } catch (Exception e) {
-                Logger.debug("Retry: " + retry + " " + request.url());
-                retry--;
-            }
+        try {
+            return client.newCall(request).execute();
+        } catch (Exception e) {
+            Logger.error(e);
+            return null;
         }
-        return null;
     }
 }

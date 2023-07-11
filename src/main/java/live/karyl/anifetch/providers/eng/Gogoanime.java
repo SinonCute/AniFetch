@@ -13,8 +13,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.tinylog.Logger;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -100,7 +98,7 @@ public class Gogoanime extends AnimeProvider {
             return animeSource;
         } catch (Exception e) {
             Logger.error("[%s] Error while parsing sources: ".formatted(siteId) + e.getMessage()
-                    + "Anime ID: " + animeId + " Episode ID: " + episodeId + " Episode Number: " + episodeNumber);
+                    + " Anime ID: " + animeId + " Episode ID: " + episodeId + " Episode Number: " + episodeNumber);
         }
         return null;
     }

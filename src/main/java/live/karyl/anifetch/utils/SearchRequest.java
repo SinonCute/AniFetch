@@ -189,7 +189,7 @@ public class SearchRequest {
 					.addEncoded("header-user-agent", config.getUserAgent())
 					.build();
 			request = new Request.Builder()
-					.url(config.getProxyVN())
+					.url(config.getProxyVNBackup())
 					.post(requestBody)
 					.build();
 			response = AniFetchApplication.getConnection().callWithoutRateLimit(request);

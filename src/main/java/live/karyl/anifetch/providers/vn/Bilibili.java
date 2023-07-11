@@ -247,13 +247,23 @@ public class Bilibili extends AnimeProvider {
 			Logger.error("Bilibili | Main page is null");
 			return false;
 		}
-		var year = Integer.parseInt(mainPage.select(".bstar-meta__create-time").text().split(",")[1].trim());
+		var yearDiv = mainPage.select(".bstar-meta__create-time").text().toLowerCase();
+		var year = 0;
+		if (!yearDiv.contains("coming soon")) {
+			year = Integer.parseInt(yearDiv.split(",")[1].trim());
+		}
 		var alias = "";
 		var title = mainPage.select(".bstar-meta__ogv-title").text();
 		var episode = mainPage.select(".ep-list > .ep-item").size();
 
 		var alias_ = mainPage.select(".bstar-meta__alias-item");
 		alias = String.join(",", alias_.stream().map(Element::text).toList());
+
+		if (year == 0) {
+			String b = String.join(",", anilistInfo.getTitle().nativeTitle, anilistInfo.getTitle().romaji, anilistInfo.getTitle().english);
+			return Utils.checkNumberEqual(episode, anilistInfo.getCurrentEpisode())
+					&& Utils.matchedRate(alias, b) > 0.6;
+		}
 
 		if (type.equals("english")) {
 			return year == anilistInfo.getReleaseDate()
