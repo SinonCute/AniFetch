@@ -2,6 +2,7 @@ package live.karyl.anifetch.database;
 
 import live.karyl.anifetch.AniFetchApplication;
 import live.karyl.anifetch.config.ConfigManager;
+import org.springframework.util.StopWatch;
 import org.tinylog.Logger;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -38,7 +39,8 @@ public class Redis {
 	}
 
 	public void set(String key, String value, String type) {
-		Logger.info("REDIS SET | {} - {}", key, type);
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
 		try (var jedis = jedisPool.getResource()) {
 			switch (type) {
 				case REDIS_SEARCH -> {
@@ -52,35 +54,55 @@ public class Redis {
 				}
 			}
 		}
+		stopWatch.stop();
+		Logger.info("REDIS SET | {} - {} | {}ms", key, type, stopWatch.getTotalTimeMillis());
 	}
 
 	public String get(String key, String type) {
-		Logger.info("REDIS - GET | {} - {}", key, type);
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
 		try (var jedis = jedisPool.getResource()) {
 			switch (type) {
 				case REDIS_SEARCH -> {
-					return jedis.get(REDIS_SEARCH + ":" + key);
+					String result = jedis.get(REDIS_SEARCH + ":" + key);
+					stopWatch.stop();
+					Logger.info("REDIS GET | {} - {} | {}ms", key, type, stopWatch.getTotalTimeMillis());
+					return result;
 				}
 				case REDIS_SOURCE -> {
-					return jedis.get(REDIS_SOURCE + ":" + key);
+					String result = jedis.get(REDIS_SOURCE + ":" + key);
+					stopWatch.stop();
+					Logger.info("REDIS GET | {} - {} | {}ms", key, type, stopWatch.getTotalTimeMillis());
+					return result;
 				}
 			}
 		}
+		stopWatch.stop();
 		return null;
 	}
 
 	public boolean exists(String key, String type) {
-		Logger.info("REDIS - CHECK EXISTS | {} - {}", key, type);
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
 		try (var jedis = jedisPool.getResource()) {
 			switch (type) {
 				case REDIS_SEARCH -> {
-					return jedis.exists(REDIS_SEARCH + ":" + key);
+					boolean result = jedis.exists(REDIS_SEARCH + ":" + key);
+					stopWatch.stop();
+					Logger.info("REDIS EXISTS | {} - {} | {}ms", key, type, stopWatch.getTotalTimeMillis());
+					return result;
 				}
 				case REDIS_SOURCE -> {
-					return jedis.exists(REDIS_SOURCE + ":" + key);
+					boolean result = jedis.exists(REDIS_SOURCE + ":" + key);
+					stopWatch.stop();
+					Logger.info("REDIS EXISTS | {} - {} | {}ms", key, type, stopWatch.getTotalTimeMillis());
+					return result;
 				}
 				case REDIS_NON_EXIST -> {
-					return jedis.exists(REDIS_NON_EXIST + ":" + key);
+					boolean result = jedis.exists(REDIS_NON_EXIST + ":" + key);
+					stopWatch.stop();
+					Logger.info("REDIS EXISTS | {} - {} | {}ms", key, type, stopWatch.getTotalTimeMillis());
+					return result;
 				}
 			}
 		}
