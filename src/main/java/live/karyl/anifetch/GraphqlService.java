@@ -36,6 +36,19 @@ public class GraphqlService {
 		});
 	}
 
+	@QueryMapping("animeSearch")
+	public Results animeSearch(@Argument String animeId, @Argument String provider) {
+		Logger.debug("Searching for " + animeId + " on " + provider);
+		var result = Utils.searchProvider(animeId, provider);
+		if (result.isEmpty()) {
+			Logger.debug("No results found on " + animeId + " on " + provider);
+			return new Results(0, false, null);
+		} else {
+			Logger.debug("Found " + result.size() + " results on " + animeId + " on " + provider);
+			return new Results(result.size(), true, result);
+		}
+	}
+
 	@QueryMapping("source")
 	public AnimeSource source(@Argument String providerId, @Argument String value) {
 		Logger.debug("Getting source for " + providerId + " " + value);

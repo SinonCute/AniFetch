@@ -105,6 +105,11 @@ public class Utils {
                         .collect(Collectors.toList()));
     }
 
+    public static List<AnimeParser> searchProvider(String id, String provider) {
+        AnilistInfo anilistInfo = fetchAnilist(id);
+        return List.of(AniFetchApplication.getProviders().get(provider).search(anilistInfo));
+    }
+
     public static CompletableFuture<List<AnimeParser>> searchAllAsyncTimer(String id) {
         AnilistInfo anilistInfo = fetchAnilist(id);
         List<CompletableFuture<AnimeParser>> futures = new ArrayList<>();
