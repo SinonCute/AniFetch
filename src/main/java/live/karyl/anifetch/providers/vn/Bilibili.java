@@ -226,7 +226,7 @@ public class Bilibili extends AnimeProvider {
 
 	private List<AnimeEpisode> extractEpisodeIds(Document mainPage) {
 		List<AnimeEpisode> episodes = new ArrayList<>();
-		var episodeElements = mainPage.select(".ep-list > .ep-item > div > a");
+		var episodeElements = mainPage.select(".ep-list > .ep-item");
 
 		for (var episodeElement : episodeElements) {
 			var episodeId = episodeElement.attr("href");
