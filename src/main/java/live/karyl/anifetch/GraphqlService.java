@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 @Controller
 public class GraphqlService {
-
 	@QueryMapping("animeSearch")
 	public CompletableFuture<Results> animeSearch(@Argument String id) {
 		Logger.debug("Searching for " + id);
@@ -36,15 +35,15 @@ public class GraphqlService {
 		});
 	}
 
-	@QueryMapping("animeSearch")
-	public Results animeSearch(@Argument String animeId, @Argument String provider) {
-		Logger.debug("Searching for " + animeId + " on " + provider);
-		var result = Utils.searchProvider(animeId, provider);
+	@QueryMapping("animeSearchProvider")
+	public Results animeSearchProvider(@Argument String id, @Argument String providerId) {
+		Logger.debug("Searching for " + id + " on " + providerId);
+		var result = Utils.searchProvider(id, providerId);
 		if (result.isEmpty()) {
-			Logger.debug("No results found on " + animeId + " on " + provider);
+			Logger.debug("No results found on " + id + " on " + providerId);
 			return new Results(0, false, null);
 		} else {
-			Logger.debug("Found " + result.size() + " results on " + animeId + " on " + provider);
+			Logger.debug("Found " + result.size() + " results on " + id + " on " + providerId);
 			return new Results(result.size(), true, result);
 		}
 	}

@@ -21,7 +21,8 @@ blacklist:
 general:
   debug: false
   okHttpRetry: 3
-  proxyVN: "https://api-vn.karyl.live/v2/server/proxy"
+#  proxyVN: "https://api-vn.karyl.live/v2/server/proxy"
+  proxyVN: "http://100.71.226.17:8081/v2/server/proxy"
   proxyVNBackup: 'http://100.71.226.17:8081/v2/server/proxy'
   aniListUrl: "https://api-us.karyl.live/consumet"
   userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"

@@ -1,5 +1,6 @@
 type Query {
     animeSearch(id: ID): Result
+    animeSearchProvider(id: ID, providerId: String): Result
     source(providerId: String, value: String): AnimeSource
 }
 
@@ -11,6 +12,7 @@ type Result {
 
 type Anime {
     animeId: ID # Anime ID
+    mediaId: ID # Media ID
     providerId: ID # Provider ID
     providerName: String # Provider name
     episodes: [Episode]

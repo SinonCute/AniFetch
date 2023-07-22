@@ -14,7 +14,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
+import org.springframework.util.StopWatch;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -157,7 +157,11 @@ public class AnimeVietsub extends AnimeProvider {
 	}
 
 	private List<AnimeEpisode> extractEpisodeIds(String link) {
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
 		Document mainPage = connect(link + "xem-phim.html", siteName);
+		stopWatch.stop();
+		System.out.println("Time to connect: " + stopWatch.getTotalTimeMillis());
 		var id = link.replaceAll(".+a(\\d+)/", "$1");
 		if (mainPage == null) return null;
 		List<AnimeEpisode> episodes = new ArrayList<>();

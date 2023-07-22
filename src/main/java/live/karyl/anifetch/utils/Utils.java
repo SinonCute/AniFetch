@@ -107,7 +107,9 @@ public class Utils {
 
     public static List<AnimeParser> searchProvider(String id, String provider) {
         AnilistInfo anilistInfo = fetchAnilist(id);
-        return List.of(AniFetchApplication.getProviders().get(provider).search(anilistInfo));
+        AnimeParser animeParser = AniFetchApplication.getProviders().get(provider).search(anilistInfo);
+        if (animeParser == null) return List.of();
+        return List.of(animeParser);
     }
 
     public static CompletableFuture<List<AnimeParser>> searchAllAsyncTimer(String id) {
