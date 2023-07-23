@@ -28,6 +28,7 @@ public class Utils {
             String url = config.getAniListUrl() + "/meta/anilist/info/" + id;
             Request request = new Request.Builder()
                     .url(url)
+                    .header("User-Agent", "Karyl/1.0.0")
                     .build();
             Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
             String result = response.body().string();

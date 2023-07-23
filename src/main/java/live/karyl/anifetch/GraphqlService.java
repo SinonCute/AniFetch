@@ -1,5 +1,6 @@
 package live.karyl.anifetch;
 
+import live.karyl.anifetch.models.AnimeMapping;
 import live.karyl.anifetch.models.AnimeSource;
 import live.karyl.anifetch.models.Results;
 import live.karyl.anifetch.utils.Utils;
@@ -46,6 +47,18 @@ public class GraphqlService {
 			Logger.debug("Found " + result.size() + " results on " + id + " on " + providerId);
 			return new Results(result.size(), true, result);
 		}
+	}
+
+	@QueryMapping("animeMapping")
+	public AnimeMapping animeMapping(@Argument String id, @Argument String providerId) {
+		Logger.info("Getting mapping for " + id + " on " + providerId);
+		var mediaId = AniFetchApplication.getPostgreSQL().getAnimeFetch(id, providerId);
+		if (mediaId == null) {
+			Logger.debug("No mapping found for " + id + " on " + providerId + ", searching again");
+			Utils.searchProvider(id, providerId);
+			mediaId = AniFetchApplication.getPostgreSQL().getAnimeFetch(id, providerId);
+		}
+		return new AnimeMapping(id, providerId, mediaId);
 	}
 
 	@QueryMapping("source")
