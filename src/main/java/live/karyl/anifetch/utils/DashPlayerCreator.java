@@ -61,9 +61,7 @@ public class DashPlayerCreator {
                 String videoUrl = source.getUrl();
                 String quality = source.getQuality();
 
-                if (quality.equals("4k")) {
-                    videoUrl = source.getUrl();
-                } else if (source.isUseHeader()) {
+                if (source.isUseHeader()) {
                     String headers = new Gson().toJson(animeSource.getHeaders());
                     videoUrl = PROXY_URL + new URLEncoder().encode(source.getUrl() ,StandardCharsets.UTF_8)
                             +  "&headers=" + headers + "&replace=true";
