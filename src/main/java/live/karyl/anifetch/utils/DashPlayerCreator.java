@@ -2,18 +2,20 @@ package live.karyl.anifetch.utils;
 
 import com.google.gson.Gson;
 import live.karyl.anifetch.models.AnimeSource;
-import org.apache.catalina.util.URLEncoder;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.StringWriter;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Base64;
 
 public class DashPlayerCreator {
 
-    private static final String PROXY_URL = "https://proxy-cf.karyl.live/?id=";
+//    private static final String PROXY_URL = "https://proxy-cf.karyl.live/?id=";
+    private static final String PROXY_URL = "http://localhost:8081/v2/server/proxy-bilibili?link=";
 
     public String generateDashXML(AnimeSource animeSource) {
         try {
@@ -59,11 +61,12 @@ public class DashPlayerCreator {
             for (var source : animeSource.getVideoResources()) {
 
                 String videoUrl = source.getUrl();
-                String quality = source.getQuality();
 
                 if (source.isUseHeader()) {
                     String headers = new Gson().toJson(animeSource.getHeaders());
-                    videoUrl = PROXY_URL + new URLEncoder().encode(source.getUrl() ,StandardCharsets.UTF_8)
+                    headers = URLEncoder.encode(headers, StandardCharsets.UTF_8);
+
+                    videoUrl = PROXY_URL + Base64.getUrlEncoder().encodeToString(source.getUrl().getBytes(StandardCharsets.UTF_8))
                             +  "&headers=" + headers + "&replace=true";
                 }
 
@@ -108,7 +111,8 @@ public class DashPlayerCreator {
             for (var source : animeSource.getAudioResources()) {
 
                 String headers = new Gson().toJson(animeSource.getHeaders());
-                String audioUrl = PROXY_URL + new URLEncoder().encode(source.getUrl(), StandardCharsets.UTF_8)
+                headers = URLEncoder.encode(headers, StandardCharsets.UTF_8);
+                String audioUrl = PROXY_URL + Base64.getUrlEncoder().encodeToString(source.getUrl().getBytes(StandardCharsets.UTF_8))
                             +  "&headers=" + headers + "&replace=true";
 
                 xmlWriter.writeStartElement("Representation");
