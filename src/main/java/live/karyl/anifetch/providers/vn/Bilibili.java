@@ -165,9 +165,7 @@ public class Bilibili extends AnimeProvider {
 				videoResource.setCodecs(codecs);
 				videoResource.setBackupUrl(videoUrlBackup);
 				videoResource.setAudioQuality(audioQuality);
-				if (!videoResource.getUrl().contains("akamaized.net")) {
-					videoResource.setUseHeader(true);
-				}
+				videoResource.setUseHeader(true);
 				if (!codecs.contains("avc")) {
 					return;
 				}
