@@ -64,7 +64,7 @@ public class GraphqlService {
 	@QueryMapping("source")
 	public AnimeSource source(@Argument String providerId, @Argument String value) {
 		Logger.debug("Getting source for " + providerId + " " + value);
-		var providers = AniFetchApplication.getProviders().values();
+		var providers = AniFetchApplication.getProviders();
 		var valueDecoded = URLDecoder.decode(value, StandardCharsets.UTF_8);
 		for (var provider : providers) {
 			if (provider.getSiteId().equals(providerId)) {

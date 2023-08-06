@@ -4,6 +4,8 @@ import live.karyl.anifetch.utils.DashPlayerCreator;
 import live.karyl.anifetch.utils.JSONToVTTConverter;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/v2/api")
@@ -24,7 +28,7 @@ public class RestService {
             return ResponseEntity.badRequest().body("Missing id");
         }
 
-        var videoSource = AniFetchApplication.getProviders().get("Bilibili").getLink(id, false);
+        var videoSource = AniFetchApplication.getProviders().get(1).getLink(id, false);
         var xmlResponse = new DashPlayerCreator().generateDashXML(videoSource);
         return ResponseEntity.ok()
                 .header("Content-Type", "application/dash+xml")
@@ -50,5 +54,20 @@ public class RestService {
         return ResponseEntity.ok()
                 .header("Content-Type", "text/vtt; charset=utf-8")
                 .body(vtt);
+    }
+
+    @GetMapping("/list-providers")
+    public ResponseEntity<String> listProviders() {
+        JSONArray providers = new JSONArray();
+        AniFetchApplication.getProviders().forEach(provider -> {
+            JSONObject providerObject = new JSONObject();
+            providerObject.put("name", provider.getSiteName());
+            providerObject.put("id", provider.getSiteId());
+            providers.put(providerObject);
+        });
+
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/json; charset=utf-8")
+                .body(providers.toString());
     }
 }

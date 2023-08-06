@@ -10,12 +10,10 @@ import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Base64;
 
 public class DashPlayerCreator {
 
-//    private static final String PROXY_URL = "https://proxy-cf.karyl.live/?id=";
-    private static final String PROXY_URL = "http://localhost:8081/v2/server/proxy-bilibili?link=";
+    private static final String PROXY_URL = "https://api.karyl.live/v2/server/proxy-bilibili?url=";
 
     public String generateDashXML(AnimeSource animeSource) {
         try {
@@ -66,7 +64,7 @@ public class DashPlayerCreator {
                     String headers = new Gson().toJson(animeSource.getHeaders());
                     headers = URLEncoder.encode(headers, StandardCharsets.UTF_8);
 
-                    videoUrl = PROXY_URL + Base64.getUrlEncoder().encodeToString(source.getUrl().getBytes(StandardCharsets.UTF_8))
+                    videoUrl = PROXY_URL + URLEncoder.encode(source.getUrl(), StandardCharsets.UTF_8)
                             +  "&headers=" + headers + "&replace=true";
                 }
 
@@ -112,7 +110,7 @@ public class DashPlayerCreator {
 
                 String headers = new Gson().toJson(animeSource.getHeaders());
                 headers = URLEncoder.encode(headers, StandardCharsets.UTF_8);
-                String audioUrl = PROXY_URL + Base64.getUrlEncoder().encodeToString(source.getUrl().getBytes(StandardCharsets.UTF_8))
+                String audioUrl = PROXY_URL + URLEncoder.encode(source.getUrl(), StandardCharsets.UTF_8)
                             +  "&headers=" + headers + "&replace=true";
 
                 xmlWriter.writeStartElement("Representation");
