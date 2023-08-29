@@ -7,11 +7,13 @@ import live.karyl.anifetch.config.ConfigManager;
 import live.karyl.anifetch.models.AnimeParser;
 import org.tinylog.Logger;
 
+import javax.sql.DataSource;
 import java.sql.*;
+import java.util.Properties;
 
 public class PostgreSQL {
 
-    private Connection sql;
+    private DataSource dataSource;
 
     private static final String INSERT_ANIME = "INSERT INTO anime (anime_id, provider_id, provider_name) VALUES (?, ?, ?)";
 
@@ -27,10 +29,24 @@ public class PostgreSQL {
             hikariConfig.setUsername(config.getDatabaseUser());
             hikariConfig.setPassword(config.getDatabasePassword());
             hikariConfig.setConnectionTimeout(config.getDatabaseTimeout());
-            hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
-            hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
-            HikariDataSource ds = new HikariDataSource(hikariConfig);
-            sql = ds.getConnection();
+            hikariConfig.setMaximumPoolSize(12);
+            hikariConfig.setMinimumIdle(12);
+            hikariConfig.setMaxLifetime(1800000);
+            hikariConfig.setKeepaliveTime(30000);
+            hikariConfig.setDataSourceProperties(new Properties() {{
+                put("cachePrepStmts", "true");
+                put("prepStmtCacheSize", "250");
+                put("prepStmtCacheSqlLimit", "2048");
+                put("useServerPrepStmts", "true");
+                put("useLocalSessionState", "true");
+                put("useLocalTransactionState", "true");
+                put("rewriteBatchedStatements", "true");
+                put("cacheResultSetMetadata", "true");
+                put("cacheServerConfiguration", "true");
+                put("elideSetAutoCommits", "true");
+                put("maintainTimeStats", "false");
+            }});
+            dataSource = new HikariDataSource(hikariConfig);
             Logger.info("PostgreSQL connection established");
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,7 +75,7 @@ public class PostgreSQL {
         String providerId = animeParser.getMediaId();
         String provider = animeParser.getProviderName();
         PreparedStatement statement = null;
-        try {
+        try (Connection sql = dataSource.getConnection()) {
             statement = sql.prepareStatement(INSERT_ANIME);
             statement.setString(1, animeId);
             statement.setString(2, providerId);
@@ -74,7 +90,7 @@ public class PostgreSQL {
     public String getAnimeFetch(String animeId, String provider) {
         PreparedStatement statement;
         ResultSet result;
-        try {
+        try (Connection sql = dataSource.getConnection()) {
             statement = sql.prepareStatement(SELECT_ANIME);
             statement.setString(1, animeId);
             statement.setString(2, provider);

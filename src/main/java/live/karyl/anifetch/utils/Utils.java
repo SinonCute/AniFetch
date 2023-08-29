@@ -28,6 +28,7 @@ public class Utils {
             String url = config.getAniListUrl() + "/meta/anilist/info/" + id;
             Request request = new Request.Builder()
                     .url(url)
+                    .header("User-Agent", "Karyl/1.0.0")
                     .build();
             Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
             String result = response.body().string();
@@ -69,24 +70,11 @@ public class Utils {
         return jaroWinklerSimilarity.apply(title1.toLowerCase(Locale.ROOT), title2.toLowerCase(Locale.ROOT));
     }
 
-    public static List<AnimeParser> searchAll(String id) {
-        AnilistInfo anilistInfo = fetchAnilist(id);
-        List<AnimeParser> animeParsers = new ArrayList<>();
-        for (var provider : AniFetchApplication.getProviders().values()) {
-            var animeParser = provider.search(anilistInfo);
-            if (animeParser == null) continue;
-            if (animeParser.getEpisodes() == null) continue;
-            animeParsers.add(animeParser);
-        }
-        return animeParsers;
-    }
-
-
     public static CompletableFuture<List<AnimeParser>> searchAllAsync(String id) {
         AnilistInfo anilistInfo = fetchAnilist(id);
         List<CompletableFuture<AnimeParser>> futures = new ArrayList<>();
 
-        for (var provider : AniFetchApplication.getProviders().values()) {
+        for (var provider : AniFetchApplication.getProviders()) {
             CompletableFuture<AnimeParser> future = CompletableFuture.supplyAsync(() -> provider.search(anilistInfo))
                     .thenApply(animeParser -> {
                         if (animeParser == null || animeParser.getEpisodes() == null || animeParser.getEpisodes().isEmpty()) {
@@ -105,11 +93,26 @@ public class Utils {
                         .collect(Collectors.toList()));
     }
 
+    public static List<AnimeParser> searchProvider(String id, String providerId) {
+        AnilistInfo anilistInfo = fetchAnilist(id);
+        for (var provider : AniFetchApplication.getProviders()) {
+            if (provider.getSiteId().equals(providerId)) {
+                AnimeParser result = provider.search(anilistInfo);
+                if (result == null || result.getEpisodes() == null || result.getEpisodes().isEmpty()) {
+                    return List.of();
+                } else {
+                    return List.of(result);
+                }
+            }
+        }
+        return List.of();
+    }
+
     public static CompletableFuture<List<AnimeParser>> searchAllAsyncTimer(String id) {
         AnilistInfo anilistInfo = fetchAnilist(id);
         List<CompletableFuture<AnimeParser>> futures = new ArrayList<>();
 
-        for (var provider : AniFetchApplication.getProviders().values()) {
+        for (var provider : AniFetchApplication.getProviders()) {
             CompletableFuture<AnimeParser> future = CompletableFuture.supplyAsync(() -> {
                 // Start stopwatch
                 long startTime = System.nanoTime();

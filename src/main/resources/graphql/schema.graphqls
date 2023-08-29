@@ -1,5 +1,7 @@
 type Query {
     animeSearch(id: ID): Result
+    animeSearchProvider(id: ID, providerId: String): Result
+    animeMapping(id: ID, providerId: String): AnimeMapping
     source(providerId: String, value: String): AnimeSource
 }
 
@@ -9,8 +11,15 @@ type Result {
     animes: [Anime]
 }
 
+type AnimeMapping {
+    animeId: ID # Anime ID
+    mediaId: ID # Media ID
+    providerId: ID # Provider ID
+}
+
 type Anime {
     animeId: ID # Anime ID
+    mediaId: ID # Media ID
     providerId: ID # Provider ID
     providerName: String # Provider name
     episodes: [Episode]

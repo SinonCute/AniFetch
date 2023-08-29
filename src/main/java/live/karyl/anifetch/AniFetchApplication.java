@@ -15,8 +15,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootApplication
 public class AniFetchApplication {
@@ -26,7 +26,7 @@ public class AniFetchApplication {
 	private static PostgreSQL postgreSQL;
 	private static ConfigManager config;
 
-	private static final Map<String, AnimeProvider> providers = new HashMap<>();
+	private static final List<AnimeProvider> providers = new ArrayList<>();
 
 	public static void main(String[] args) {
 
@@ -48,13 +48,17 @@ public class AniFetchApplication {
 	}
 
 	public static void init() {
-		providers.put("Bilibili", new Bilibili());
-		providers.put("AnimeTVN", new AnimeTVN());
-		providers.put("WebLinhTinh", new WebLinhTinh());
-		providers.put("AnimeHay", new AnimeHay());
-		providers.put("AnimeVietsub", new AnimeVietsub());
-		providers.put("GogoAnime", new Gogoanime());
-		providers.put("9anime", new NineAnime());
+		providers.addAll(
+				List.of(
+						new Bilibili(),
+						new AnimeTVN(),
+						new WebLinhTinh(),
+						new AnimeHay(),
+						new AnimeVietsub(),
+						new Gogoanime(),
+						new NineAnime()
+				)
+		);
 	}
 
 	public static File getDataFolder() {
@@ -72,7 +76,7 @@ public class AniFetchApplication {
 		return connection;
 	}
 
-	public static Map<String, AnimeProvider> getProviders() { return providers; }
+	public static List<AnimeProvider> getProviders() { return providers; }
 
 	public static Redis getRedis() { return redis; }
 

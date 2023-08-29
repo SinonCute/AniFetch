@@ -125,13 +125,7 @@ public class AnimeHay extends AnimeProvider {
 		var yearElement = mainPage.select(".update_time > div:nth-child(2)");
 		String title = mainPage.select(".heading_movie").text();
 		int year = Integer.parseInt(yearElement.text());
-		int episode;
-
-		if (episodeElement.size() == 1) {
-			episode = 1;
-		} else {
-			episode = episodeElement.size();
-		}
+		int episode = episodeElement.size();
 
 		if (type.equals("english")) {
 			return year == anilistInfo.getReleaseDate()

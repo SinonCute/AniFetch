@@ -15,6 +15,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.springframework.security.core.parameters.P;
 import org.tinylog.Logger;
 
 import java.util.ArrayList;
@@ -165,6 +166,9 @@ public class Bilibili extends AnimeProvider {
 				videoResource.setBackupUrl(videoUrlBackup);
 				videoResource.setAudioQuality(audioQuality);
 				videoResource.setUseHeader(true);
+				if (!codecs.contains("avc")) {
+					return;
+				}
 				videoResources.add(videoResource);
 			});
 
