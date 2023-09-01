@@ -24,7 +24,7 @@ import java.util.Map;
 public class AnimeVietsub extends AnimeProvider {
 
 	public AnimeVietsub() {
-		super("AnimeVietsub", "AVS","https://animevietsub.moe/");
+		super("AnimeVietsub", "AVS","https://animevietsub.fan/");
 	}
 
 	@Override
