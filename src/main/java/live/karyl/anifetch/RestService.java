@@ -28,7 +28,8 @@ public class RestService {
             return ResponseEntity.badRequest().body("Missing id");
         }
 
-        var videoSource = AniFetchApplication.getProviders().get(1).getLink(id, false);
+        var provider = AniFetchApplication.getProviders().stream().filter(p -> p.getSiteId().equals("BL")).findFirst().orElse(null);
+        var videoSource = provider.getLink(id, false);
         var xmlResponse = new DashPlayerCreator().generateDashXML(videoSource);
         return ResponseEntity.ok()
                 .header("Content-Type", "application/dash+xml")
