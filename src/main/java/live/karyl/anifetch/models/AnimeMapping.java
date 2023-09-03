@@ -1,3 +1,6 @@
 package live.karyl.anifetch.models;
 
-public record AnimeMapping(String animeId, String providerId, String mediaId) {}
+import java.util.Map;
+
+public record AnimeMapping(String animeId, Map<String, String> mappings) {}
+

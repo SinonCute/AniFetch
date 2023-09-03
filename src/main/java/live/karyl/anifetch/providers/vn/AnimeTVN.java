@@ -35,7 +35,7 @@ public class AnimeTVN extends AnimeProvider {
 
 
 	public AnimeTVN() {
-		super("AnimeTVN", "ATVN","https://animetvn.live/");
+		super("AnimeTVN", "ATVN","https://animetvn2.com/");
 		token = new String[2];
 		tokenLifeTime = System.currentTimeMillis() + Duration.ofHours(12).toMillis();
 		requestToken();
@@ -58,10 +58,10 @@ public class AnimeTVN extends AnimeProvider {
 			if (animeParser != null) return animeParser;
 		}
 
-		if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
-			var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
-			var episodes = extractEpisodeIds(baseUrl + "thong-tin-phim/f" + id + "-a.html");
-			animeParser = new AnimeParser(anilistInfo.getId(), id,  siteId, siteName);
+		var providerId = mongoDB.getAnimeMapping(anilistInfo.getId()).mappings().get(siteId);
+		if (providerId != null) {
+			var episodes = extractEpisodeIds(baseUrl + "thong-tin-phim/f" + providerId + "-a.html");
+			animeParser = new AnimeParser(anilistInfo.getId(), providerId,  siteId, siteName);
 			animeParser.setEpisodes(episodes);
 			redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
 			return animeParser;
@@ -80,7 +80,7 @@ public class AnimeTVN extends AnimeProvider {
 					animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
 					animeParser.setEpisodes(episodes);
 					redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
-					postgreSQL.addAnimeFetch(animeParser);
+					addAnimeMapping(anilistInfo.getId(), animeParser.getProviderId(), animeParser.getMediaId());
 					break;
 				}
 			}

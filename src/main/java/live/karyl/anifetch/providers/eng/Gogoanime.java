@@ -36,10 +36,10 @@ public class Gogoanime extends AnimeProvider {
             if (animeParser != null) return animeParser;
         }
 
-        if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
-            var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
+        var providerId = mongoDB.getAnimeMapping(anilistInfo.getId()).mappings().get(siteId);
+        if (providerId != null) {
             var episodes = extractEpisodeIds(anilistInfo.getId());
-            animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
+            animeParser = new AnimeParser(anilistInfo.getId(), providerId, siteId, siteName);
             animeParser.setEpisodes(episodes);
             redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
             return animeParser;
@@ -49,7 +49,7 @@ public class Gogoanime extends AnimeProvider {
         animeParser = new AnimeParser(anilistInfo.getId(), anilistInfo.getId(), siteId, siteName);
         animeParser.setEpisodes(episodes);
         redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
-        postgreSQL.addAnimeFetch(animeParser);
+        addAnimeMapping(anilistInfo.getId(), animeParser.getProviderId(), animeParser.getMediaId());
 
         return animeParser;
     }

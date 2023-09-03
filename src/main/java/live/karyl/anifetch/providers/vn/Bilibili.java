@@ -52,10 +52,10 @@ public class Bilibili extends AnimeProvider {
 			if (animeParser != null) return animeParser;
 		}
 
-		if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
-			var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
-			var episodes = extractEpisodeIds(connect(WATCH_URL + id, siteName));
-			animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
+		var providerId = mongoDB.getAnimeMapping(anilistInfo.getId()).mappings().get(siteId);
+		if (providerId != null) {
+			var episodes = extractEpisodeIds(connect(WATCH_URL + providerId, siteName));
+			animeParser = new AnimeParser(anilistInfo.getId(), providerId, siteId, siteName);
 			animeParser.setEpisodes(episodes);
 			redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
 			return animeParser;
@@ -73,7 +73,7 @@ public class Bilibili extends AnimeProvider {
 					animeParser = new AnimeParser(anilistInfo.getId(), searchResult, siteId, siteName);
 					animeParser.setEpisodes(episodes);
 					redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
-					postgreSQL.addAnimeFetch(animeParser);
+					addAnimeMapping(anilistInfo.getId(), animeParser.getProviderId(), animeParser.getMediaId());
 					break;
 				}
 			}

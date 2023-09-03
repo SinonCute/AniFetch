@@ -26,7 +26,7 @@ public class AnimeHay extends AnimeProvider {
 	private static final String PLAYER_API = "https://suckplayer.xyz/player/index.php?data=%s&do=getVideo";
 
 	public AnimeHay() {
-		super("AnimeHay", "AH","https://animehay.io/");
+		super("AnimeHay", "AH","https://animehay.city/");
 	}
 
 	@Override
@@ -47,10 +47,10 @@ public class AnimeHay extends AnimeProvider {
 			if (animeParser != null) return animeParser;
 		}
 
-		if (postgreSQL.checkAnimeFetchExists(anilistInfo.getId(), siteName)) {
-			var id = postgreSQL.getAnimeFetch(anilistInfo.getId(), siteName);
-			var episodes = extractEpisodeIds(baseUrl + "thong-tin-phim/a-" + id + ".html");
-			animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
+		var providerId = mongoDB.getAnimeMapping(anilistInfo.getId()).mappings().get(siteId);
+		if (providerId != null) {
+			var episodes = extractEpisodeIds(baseUrl + "thong-tin-phim/a-" + providerId + ".html");
+			animeParser = new AnimeParser(anilistInfo.getId(), providerId, siteId, siteName);
 			animeParser.setEpisodes(episodes);
 			redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
 			return animeParser;
@@ -69,7 +69,7 @@ public class AnimeHay extends AnimeProvider {
 					animeParser = new AnimeParser(anilistInfo.getId(), id, siteId, siteName);
 					animeParser.setEpisodes(episodes);
 					redis.set(redisId, animeParser.toJson(), REDIS_SEARCH);
-					postgreSQL.addAnimeFetch(animeParser);
+					addAnimeMapping(anilistInfo.getId(), animeParser.getProviderId(), animeParser.getMediaId());
 					break;
 				}
 			}

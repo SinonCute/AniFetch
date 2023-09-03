@@ -6,6 +6,7 @@ import live.karyl.anifetch.models.AnilistInfo;
 import live.karyl.anifetch.models.AnimeParser;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -97,7 +98,11 @@ public class Utils {
         AnilistInfo anilistInfo = fetchAnilist(id);
         for (var provider : AniFetchApplication.getProviders()) {
             if (provider.getSiteId().equals(providerId)) {
+                StopWatch stopWatch = new StopWatch();
+                stopWatch.start();
                 AnimeParser result = provider.search(anilistInfo);
+                stopWatch.stop();
+                Logger.debug("Processed {} on {} in {} ms", id, provider.getSiteName(), stopWatch.getTime());
                 if (result == null || result.getEpisodes() == null || result.getEpisodes().isEmpty()) {
                     return List.of();
                 } else {
@@ -169,6 +174,24 @@ public class Utils {
         }
         response.close();
         return true;
+    }
 
+    public static List<String> getAnimeIDs() {
+        List<String> ids = new ArrayList<>();
+        try {
+            Request request = new Request.Builder()
+                    .url("https://sinoncute.github.io/Anilist-Anime-IDs/data/ids.txt")
+                    .build();
+            Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
+            String result = response.body().string();
+            response.close();
+            String[] lines = result.split("\n");
+            for (String line : lines) {
+                ids.add(line.split(" ")[0]);
+            }
+        } catch (Exception e) {
+            Logger.error(e);
+        }
+        return ids;
     }
 }

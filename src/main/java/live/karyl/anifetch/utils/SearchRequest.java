@@ -24,7 +24,7 @@ public class SearchRequest {
 
 			if (key == null) return new String[0];
 
-			String searchURL = "https://animetvn.live/tim-kiem-nang-cao.html?" +
+			String searchURL = "https://animetvn2.com/tim-kiem-nang-cao.html?" +
 					"q=" + URLEncoder.encode(key, StandardCharsets.UTF_8) +
 					"&nam=" + year;
 			Request request = new Request.Builder()
@@ -41,13 +41,13 @@ public class SearchRequest {
 			Document doc = Jsoup.parse(response.body().string());
 			Elements elements = doc.select(".film-list > .film_item > .film_item_inner > a");
 
-			if (elements.size() == 0) {
+			if (elements.isEmpty()) {
 				Logger.debug("No result on animeTVN, trying to search with ajax");
 				RequestBody requestBody = new FormBody.Builder()
 						.addEncoded("key", key)
 						.build();
 				request = new Request.Builder()
-						.url("https://animetvn.live/ajax/search")
+						.url("https://animetvn2.com/ajax/search")
 						.addHeader("x-csrf-token", token[0])
 						.addHeader("Cookie", token[1])
 						.addHeader("x-requested-with", "XMLHttpRequest")
@@ -99,7 +99,7 @@ public class SearchRequest {
 		try {
 			if (key == null) return new String[0];
 			String keyEncoded = URLEncoder.encode(key.replaceAll(" ", "-"), StandardCharsets.UTF_8);
-			String searchURL = "https://animehay.io/tim-kiem/" + keyEncoded + ".html";
+			String searchURL = "https://animehay.city/tim-kiem/" + keyEncoded + ".html";
 			RequestBody requestBody = new FormBody.Builder()
 					.addEncoded("url", searchURL)
 					.addEncoded("method", "GET")

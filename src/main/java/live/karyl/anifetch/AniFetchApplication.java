@@ -2,7 +2,7 @@ package live.karyl.anifetch;
 
 import live.karyl.anifetch.config.ConfigManager;
 import live.karyl.anifetch.connection.OkHttp;
-import live.karyl.anifetch.database.PostgreSQL;
+import live.karyl.anifetch.database.MongoDB;
 import live.karyl.anifetch.database.Redis;
 import live.karyl.anifetch.providers.AnimeProvider;
 import live.karyl.anifetch.providers.eng.Gogoanime;
@@ -10,6 +10,8 @@ import live.karyl.anifetch.providers.eng.NineAnime;
 import live.karyl.anifetch.providers.vn.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 
 import java.io.File;
 import java.io.InputStream;
@@ -18,12 +20,15 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {
+		MongoAutoConfiguration.class,
+		MongoDataAutoConfiguration.class
+})
 public class AniFetchApplication {
 
 	private static OkHttp connection;
 	private static Redis redis;
-	private static PostgreSQL postgreSQL;
+	private static MongoDB mongoDB;
 	private static ConfigManager config;
 
 	private static final List<AnimeProvider> providers = new ArrayList<>();
@@ -39,8 +44,8 @@ public class AniFetchApplication {
 		redis = new Redis();
 		redis.init();
 
-		postgreSQL = new PostgreSQL();
-		postgreSQL.init();
+		mongoDB = new MongoDB();
+		mongoDB.init();
 
 		init();
 
@@ -80,7 +85,7 @@ public class AniFetchApplication {
 
 	public static Redis getRedis() { return redis; }
 
-	public static PostgreSQL getPostgreSQL() { return postgreSQL; }
+	public static MongoDB getMongoDB() { return mongoDB; }
 
 	public static ConfigManager getConfig() { return config; }
 }

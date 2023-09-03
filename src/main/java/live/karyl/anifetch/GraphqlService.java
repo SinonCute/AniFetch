@@ -1,6 +1,5 @@
 package live.karyl.anifetch;
 
-import live.karyl.anifetch.models.AnimeMapping;
 import live.karyl.anifetch.models.AnimeSource;
 import live.karyl.anifetch.models.Results;
 import live.karyl.anifetch.utils.Utils;
@@ -49,7 +48,7 @@ public class GraphqlService {
 		}
 	}
 
-	@QueryMapping("animeMapping")
+	/*@QueryMapping("animeMapping")
 	public AnimeMapping animeMapping(@Argument String id, @Argument String providerId) {
 		Logger.info("Getting mapping for " + id + " on " + providerId);
 		var mediaId = AniFetchApplication.getPostgreSQL().getAnimeFetch(id, providerId);
@@ -59,7 +58,7 @@ public class GraphqlService {
 			mediaId = AniFetchApplication.getPostgreSQL().getAnimeFetch(id, providerId);
 		}
 		return new AnimeMapping(id, providerId, mediaId);
-	}
+	}*/
 
 	@QueryMapping("source")
 	public AnimeSource source(@Argument String providerId, @Argument String value) {
