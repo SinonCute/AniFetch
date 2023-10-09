@@ -14,6 +14,7 @@ import org.tinylog.Logger;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 public class MongoDB {
     private final ConfigManager config = ConfigManager.getInstance();
@@ -48,7 +49,7 @@ public class MongoDB {
         StopWatch stopWatch = StopWatch.createStarted();
         var collection = database.getCollection("anime");
         var document = collection.find(new Document("animeId", animeId)).first();
-        if (document == null) return null;
+        if (document == null) return new AnimeMapping(animeId, new HashMap<>());
         stopWatch.stop();
         Logger.info("Got anime " + animeId + " from database ({}ms)",stopWatch.getTime());
         return new Gson().fromJson(document.toJson(), AnimeMapping.class);
