@@ -127,7 +127,7 @@ public class SearchRequest {
 
 	public static String[] animeVietsub(String key) {
 		try {
-			String searchURL = "https://animevietsub.moe/ajax/suggest";
+			String searchURL = "https://animevietsub.fan/ajax/suggest";
 
 			if (key == null) return new String[0];
 
