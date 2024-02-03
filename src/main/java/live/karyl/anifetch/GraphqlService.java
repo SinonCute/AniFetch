@@ -48,18 +48,6 @@ public class GraphqlService {
 		}
 	}
 
-	/*@QueryMapping("animeMapping")
-	public AnimeMapping animeMapping(@Argument String id, @Argument String providerId) {
-		Logger.info("Getting mapping for " + id + " on " + providerId);
-		var mediaId = AniFetchApplication.getPostgreSQL().getAnimeFetch(id, providerId);
-		if (mediaId == null) {
-			Logger.debug("No mapping found for " + id + " on " + providerId + ", searching again");
-			Utils.searchProvider(id, providerId);
-			mediaId = AniFetchApplication.getPostgreSQL().getAnimeFetch(id, providerId);
-		}
-		return new AnimeMapping(id, providerId, mediaId);
-	}*/
-
 	@QueryMapping("source")
 	public AnimeSource source(@Argument String providerId, @Argument String value) {
 		Logger.debug("Getting source for " + providerId + " " + value);

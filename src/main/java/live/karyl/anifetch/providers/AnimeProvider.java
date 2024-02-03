@@ -54,6 +54,16 @@ public abstract class AnimeProvider {
 
     public abstract AnimeSource getLink(String value, boolean ignoreCache);
 
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public String getSiteId() {
+        return siteId;
+    }
+
+    public String getAnifyApiKey() { return  ANIFY_API_KEY; }
+
     protected Document connect(String url, String siteName) {
         StopWatch stopWatch = StopWatch.createStarted();
         switch (siteName) {
@@ -143,14 +153,4 @@ public abstract class AnimeProvider {
             AniFetchApplication.getMongoDB().addAnimeMapping(animeMapping);
         }
     }
-
-    public String getSiteName() {
-        return siteName;
-    }
-
-    public String getSiteId() {
-        return siteId;
-    }
-
-    public String getAnifyApiKey() { return  ANIFY_API_KEY; }
 }

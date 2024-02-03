@@ -76,7 +76,7 @@ public class WebLinhTinh extends AnimeProvider {
         return animeParser;
     }
 
-    public List<AnimeEpisode> extractEpisodeIds(String id) {
+    private List<AnimeEpisode> extractEpisodeIds(String id) {
         List<AnimeEpisode> episodes = new ArrayList<>();
         var response = requestPostGetLink(new String[]{"", "", id}, "getEpisode");
         if (response == null) return episodes;
@@ -149,7 +149,7 @@ public class WebLinhTinh extends AnimeProvider {
         }
     }
 
-    public String requestPostGetLink(String[] data, String actionType) {
+    private String requestPostGetLink(String[] data, String actionType) {
         try {
             String url = "https://weblinhtinh.net/wp-admin/admin-ajax.php";
             FormBody req;

@@ -175,23 +175,4 @@ public class Utils {
         response.close();
         return true;
     }
-
-    public static List<String> getAnimeIDs() {
-        List<String> ids = new ArrayList<>();
-        try {
-            Request request = new Request.Builder()
-                    .url("https://sinoncute.github.io/Anilist-Anime-IDs/data/ids.txt")
-                    .build();
-            Response response = AniFetchApplication.getConnection().callWithoutRateLimit(request);
-            String result = response.body().string();
-            response.close();
-            String[] lines = result.split("\n");
-            for (String line : lines) {
-                ids.add(line.split(" ")[0]);
-            }
-        } catch (Exception e) {
-            Logger.error(e);
-        }
-        return ids;
-    }
 }

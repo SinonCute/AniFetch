@@ -39,8 +39,6 @@ public class Redis {
 	}
 
 	public void set(String key, String value, String type) {
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
 		try (var jedis = jedisPool.getResource()) {
 			switch (type) {
 				case REDIS_SEARCH -> {
@@ -54,55 +52,33 @@ public class Redis {
 				}
 			}
 		}
-		stopWatch.stop();
-		Logger.info("REDIS SET | {} - {} | {}ms", key, type, stopWatch.getTotalTimeMillis());
 	}
 
 	public String get(String key, String type) {
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
 		try (var jedis = jedisPool.getResource()) {
 			switch (type) {
 				case REDIS_SEARCH -> {
-					String result = jedis.get(REDIS_SEARCH + ":" + key);
-					stopWatch.stop();
-					Logger.info("REDIS GET | {} - {} | {}ms", key, type, stopWatch.getTotalTimeMillis());
-					return result;
+                    return jedis.get(REDIS_SEARCH + ":" + key);
 				}
 				case REDIS_SOURCE -> {
-					String result = jedis.get(REDIS_SOURCE + ":" + key);
-					stopWatch.stop();
-					Logger.info("REDIS GET | {} - {} | {}ms", key, type, stopWatch.getTotalTimeMillis());
-					return result;
+                    return jedis.get(REDIS_SOURCE + ":" + key);
 				}
 			}
 		}
-		stopWatch.stop();
 		return null;
 	}
 
 	public boolean exists(String key, String type) {
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
 		try (var jedis = jedisPool.getResource()) {
 			switch (type) {
 				case REDIS_SEARCH -> {
-					boolean result = jedis.exists(REDIS_SEARCH + ":" + key);
-					stopWatch.stop();
-					Logger.info("REDIS EXISTS | {} - {} | {}ms", key, type, stopWatch.getTotalTimeMillis());
-					return result;
+                    return jedis.exists(REDIS_SEARCH + ":" + key);
 				}
 				case REDIS_SOURCE -> {
-					boolean result = jedis.exists(REDIS_SOURCE + ":" + key);
-					stopWatch.stop();
-					Logger.info("REDIS EXISTS | {} - {} | {}ms", key, type, stopWatch.getTotalTimeMillis());
-					return result;
+                    return jedis.exists(REDIS_SOURCE + ":" + key);
 				}
 				case REDIS_NON_EXIST -> {
-					boolean result = jedis.exists(REDIS_NON_EXIST + ":" + key);
-					stopWatch.stop();
-					Logger.info("REDIS EXISTS | {} - {} | {}ms", key, type, stopWatch.getTotalTimeMillis());
-					return result;
+                    return jedis.exists(REDIS_NON_EXIST + ":" + key);
 				}
 			}
 		}

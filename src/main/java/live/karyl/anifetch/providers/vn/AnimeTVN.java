@@ -208,7 +208,7 @@ public class AnimeTVN extends AnimeProvider {
 				&& Utils.matchedRate(title, anilistInfo.getTitle().romaji) > 0.5;
 	}
 
-	public String playHQB(String fileID) {
+	private String playHQB(String fileID) {
 		try {
 			System.out.println();
 			String url = "https://api-plhq.playhbq.xyz/apiv4/" + ANIME_TVN_USER_ID + "/" + fileID;
@@ -236,7 +236,7 @@ public class AnimeTVN extends AnimeProvider {
 		}
 	}
 
-	public String requestPostGetLink(String data, boolean multiServer) {
+	private String requestPostGetLink(String data, boolean multiServer) {
 		try {
 			String url;
 			FormBody req;
